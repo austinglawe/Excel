@@ -21,10 +21,10 @@ Type - Steal, Block, Foul Drawn, Assist, Substitute
   Foul Drawn - Shooting Foul, Offensive
   
   
-Type 1             Type 2                     Type 3                   Type 3           Type 4                                            Player
-Shot                2-Point                    Made,Missed              Distance        Hook Shot, Dunk, Jump Shot, Tip In, Layup         Player Name
-Shot                3-Point                    Made, Missed             Distance        Jump Shot                                         Player Name
-Shot                Free Throws                Made, Missed             Distance        AND-1                                             Player Name
+Type 1             Type 2                     Type 3                                                Type 3              Type 4           Player
+Shot                2-Point                    Hook Shot, Dunk, Jump Shot, Tip In, Layup            Made, Missed         Distance         Player Name
+Shot                3-Point                    Jump Shot                                            Made, Missed         Distance         Player Name
+Shot                Free Throws                Made, Missed                                         (AND-1)                               Player Name
 Rebound             Offensive, Defensive                                                                                                  Player Name, Team
 Jump Ball           Win, Lose                                                                                                             Player Name
 Sub                 Out                                                                                                                   Player Name
