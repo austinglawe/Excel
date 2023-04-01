@@ -1,1 +1,40 @@
+--Primary--
+Type - Shot, Rebound, Jump Ball, Substitute, Turnover
 
+  Shot - 2-Point, 3-Point, Free Throw
+    2-Point - Hook Shot, Dunk, Jump Shot, Tip In
+    3-Point - Jump Shot
+    Free Throws - __ of __ , 
+                AND 1
+  Rebound - Offensive, Defensive
+  Jump Ball- Win, Lose
+  Sub - In, Out
+  Turnover - Offensive Foul, Bad Pass, Lost Ball
+  Foul - Personal, Offensive, Shooting
+
+
+--Secondary---
+Type - Steal, Block, Foul Drawn, Assist, Substitute
+  
+  Steal - 
+  Block - 
+  Foul Drawn - Shooting Foul, Offensive
+  
+  
+Type 1             Type 2                Type 3           Type 4                                     Player
+Shot                2-Point               Distance        Hook Shot, Dunk, Jump Shot, Tip In          Player Name
+Shot                3-Point               Distance        Jump Shot                                   Player Name
+Shot                Free Throws           Distance          AND-1                                     Player Name
+Rebound             Offensive, Defensive                                                              Player Name
+Jump Ball           Win, Lose                                                                         Player Name
+Sub                 Out                                                                               Player Name
+Turnover            Offensive Foul, Bad Pass, Lost Ball                                               Player Name
+Foul                Personal, Offensive, Shooting                                                     Player Name
+
+
+
+Sub                 In                                                                                Player Name
+Assist                                                                                                Player Name
+Steal                                                                                                 Player Name
+Block                                                                                                 Player Name
+Foul Drawn          Shooting, Offensive                                                               Player Name
