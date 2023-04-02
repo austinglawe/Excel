@@ -1,1 +1,57 @@
+[distance can equal " 1" or "11" - one number value, or 2]
+
+Jump ball: Player1 vs. Player2 (Player3 gains possession)
+
+Player1 makes 2-pt layup from [distance] ft (assist by Player2)
+Player1 makes 2-pt layup from [distance] ft
+Player1 makes 2-pt layup at rim (assist by Player2)
+Player1 makes 2-pt layup at rim
+Player1 makes 2-pt jumpshot
+Player1 makes 2-pt jumpshot (assist by Player2)
+Player1 makes 2-pt dunk at rim
+Player1 makes 2-pt dunk at rim (assist by Player2)
+Player1 makes 2-pt hook shot from [distance] ft
+Player1 makes 2-pt hook shot from [distance] ft (assist by Player2)
+Player1 misses 2-pt jumpshot from [distance] ft
+Player1 misses 2-pt layup from [distance] ft
+Player1 misses 2-pt layup from [distance] ft (block by Player2)
+Player1 misses 2-pt layup at rim
+Player1 misses 2-pt jumpshot from [distance] ft
+
+Player1 makes 3-pt jump shot from [distance] ft (assist by Player2)
+Player1 makes 3-pt jump shot from [distance] ft
+Player1 misses 3-pt jump shot from [distance] ft
+Player1 misses 3-pt jump shot from [distance] ft (block by Player2)
+
+Player1 makes free throw __ of __
+Player1 misses free throw __ of __
+
+Offensive rebound by Player1
+Offensive rebound by Team1
+Defensive rebound by Player1
+Defensive rebound by Team1
+
+Loose ball foul by Player1 (drawn by Player2)
+Shooting foul by Player1 (drawn by Player2)
+Offensive foul by Player1 (drawn by Player2)
+Personal foul by Player1 (drawn by Player2)
+Personal take foul by Player1 (drawn by Player2)
+
+Team1 full timeout
+
+Player2 enters the game for Player1
+
+Turnover by Player1 (offensive foul)
+Turnover by Player1 (bad pass; steal by Player2)
+Turnover by Player1 (lost ball; steal by Player2)
+Turnover by Player1 (bad pass)
+Turnover by Player1 (traveling)
+Turnover by Team (shot clock)
+
+
+
+
+
+
+
 
