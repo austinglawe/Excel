@@ -1,3 +1,84 @@
+Paste NBA Game Play by Play
+It will take up Columns A-F
+A = Time, Quarter, 
+B = Away Team Name, Away Team involved in Play, Start/End of Quarter
+C = +Points(Away Team)
+D = Running Score
+E = +Points(Home Team)
+F = Home Team Name, Home Team involved in Play
+
+G1 = "Home Team"
+H1 = "Away Team"
+G2 = '=F2' ###Prints the Home Team
+H2 = 'B2'  ###Prints the Away Team
+
+I1 = "Team"
+I4 = '=IF(LEN(B4)>0,$H$2,IF(LEN(F4)>0,$G$2))' ###Prints Team involved in play by play
+
+J1 = "Play"
+J4 = '=B4&F4' ###Prints Play by either team
+
+K1 = "Made_or_Missed"
+K4 = '=IF(ISNUMBER(SEARCH("makes",J4)),"Made",IF(ISNUMBER(SEARCH("misses",J4)),"Missed",""))'
+
+L1 = "Shot_type"
+L4 = '=IF(ISNUMBER(SEARCH("2-pt",J4)),"2-pt",IF(ISNUMBER(SEARCH("3-pt",J4)),"3-pt",
+      IF(ISNUMBER(SEARCH("Free Throw",J4)),"Free Throws","")))'
+
+M1 = "Distance_draft"
+M4 = '=IFERROR(MID(J4,FIND(" ft",J4)-2,2),IF(ISNUMBER(SEARCH("at rim",J4)),0,""))'
+
+N1 = "Distance_final"
+N4 = '=IF(ISNUMBER(SEARCH(" ",M4)),RIGHT(M4,1),M4)'
+
+O1 = "Shot_style"
+04 = '=IF(ISNUMBER(SEARCH("dunk at rim",J4)),"Dunk at the Rim",IF(ISNUMBER(SEARCH("dunk",J4)), "Dunk",IF(ISNUMBER(SEARCH("Layup at rim",J4)), "Layup at the Rim",IF(ISNUMBER(SEARCH("layup",J4)),"Layup",IF(ISNUMBER(SEARCH("jump shot",J4)),"Jump Shot",IF(ISNUMBER(SEARCH("layup at rim",J4)),"Layup at the Rim",IF(ISNUMBER(SEARCH("hook shot",J4)),"Hook Shot",IF(ISNUMBER(SEARCH("tip",J4)),"Tip",""))))))))'
+
+####'=IF(ISNUMBER(SEARCH("dunk at rim",J4)),"Dunk at the Rim",IF(ISNUMBER(SEARCH("dunk",J4)), "Dunk",
+      IF(ISNUMBER(SEARCH("Layup at rim",J4)), "Layup at the Rim",IF(ISNUMBER(SEARCH("layup",J4)),"Layup",
+      IF(ISNUMBER(SEARCH("jump shot",J4)),"Jump Shot",IF(ISNUMBER(SEARCH("layup at rim",J4)),"Layup at the Rim",
+      IF(ISNUMBER(SEARCH("hook shot",J4)),"Hook Shot",IF(ISNUMBER(SEARCH("tip",J4)),"Tip","")))))))))'
+      
+P1 = "Rebound"
+P4 = '=IF(ISNUMBER(SEARCH("rebound",J4)),"Rebound","")'
+
+Q1 = "Rebound_type"
+Q4 = '=IF(P4="Rebound",IF(ISNUMBER(SEARCH("Offensive",J4)),"Offensive",IF(ISNUMBER(SEARCH("Defensive",J4)), "Defensive",IF(ISNUMBER(SEARCH("Team Rebound",J4)),"Team",""))),"")'
+
+R1 = "Assist"
+R4 = '=IF(ISNUMBER(SEARCH("assist",J4)),"Assist","")'
+
+S1 = "Foul"
+S4 = '=IF(ISNUMBER(SEARCH("foul",J4)),"Foul","")'
+
+T1 = "Foul_type"
+T4 = '
+
+U1 = "Turnover"
+U4 = '=IF(ISNUMBER(SEARCH("turnover",J4)),"Turnover","")'
+
+V1 = "Turnover_type"
+V4 = '
+
+W1 = "Timeout"
+W4 = '=IF(ISNUMBER(SEARCH("timeout",J4)),"Timeout","")'
+
+X1 = "Timeout_type"
+X4 = '
+
+Y1 = "Substitution"
+Y4 = '=IF(ISNUMBER(SEARCH("enters the game",J4)),"Substitution","")'
+
+Z1 = "Block"
+Z4 = '=IF(ISNUMBER(SEARCH("block",J4)),"Block","")'
+
+AA1 = "Steal"
+AA4 = =IF(ISNUMBER(SEARCH("steal",J4)),"Steal","")
+
+
+
+
+
 [distance can equal " 1" or "11" - one number value, or 2]
 
 Jump ball: Player1 vs. Player2 (Player3 gains possession)
