@@ -16,6 +16,8 @@ I1 = "Team"
 I4 = '=IF(LEN(B4)>0,$H$2,IF(LEN(F4)>0,$G$2))' ###Prints Team involved in play by play
 
 J1 = "Play"
+J3 = '=IF(OR(A3="Time", A3="1st Q", A3="2nd Q", A3="3rd Q", A3="4th Q", A3="1st OT", A3="2nd OT", A3="3rd OT", A3="4th OT", A3="5th OT", A3="6th OT"), "", B3&F3)'
+      ####Prints Play by either team and takes out the quarter
 J4 = '=B4&F4' ###Prints Play by either team
 
 K1 = "Made_or_Missed"
