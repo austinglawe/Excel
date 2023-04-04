@@ -13,6 +13,8 @@ G2 = '=F2' ###Prints the Home Team
 H2 = 'B2'  ###Prints the Away Team
 
 I1 = "Team"
+I3 = '=IF(ISNUMBER(SEARCH("Jump ball",B3)),I4,IF(OR(A3="Time",A3="1st Q",A3="2nd Q",A3="3rd Q",A3="4th Q",A3="1st OT",A3="2nd OT",A3="3rd OT",A3="4th OT",A3="5th OT",A3="6th OT"),"",(IF(LEN(B3)>0,$H$2,IF(LEN(F3)>0,$G$2,"")))))'
+      ###Prints Team as long, Jump ball it uses the team below (meaning that's the team that wins the jump), then takes out the quarters and time, to base it solely off of which team's side (team) the play comes from.
 I4 = '=IF(LEN(B4)>0,$H$2,IF(LEN(F4)>0,$G$2))' ###Prints Team involved in play by play
 
 J1 = "Play"
