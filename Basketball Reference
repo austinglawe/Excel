@@ -42,3 +42,6 @@ Jump Ball           Win, Lose                  Player Name
 
 
 Jump Ball           Gain Possession            Player Name
+
+
+=IF(OR(A3="Time", A3="1st Q", A3="2nd Q", A3="3rd Q", A3="4th Q", A3="1st OT", A3="2nd OT", A3="3rd OT", A3="4th OT", A3="5th OT", A3="6th OT"), "",
