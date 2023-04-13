@@ -1,0 +1,59 @@
+Column P converted to a date instead of a height.
+So in order to Convert it I made two columns
+U was
+=month(P2)
+and from there the ft was extracted
+then I sorted that result in order to get draw away any numbers for the inches that were 0
+V then became 0 for the 00
+and all others became
+=day(P2)
+from there I needed to make all numbers with only one inch digit (1-9) into a two digit number
+so using V in W
+=if(len(V2=1,"0"&V2,V2)
+Now from there I needed to use the ' and " characters to determine ft and inches
+so I made V1 ' by typing '' (' twice)
+and I made W1 "
+so then X became
+=U2& $V$1 & W2 & $W$1
+then $ symbol made it locked on that cell as I filled down.
+
+then to take off the " from the W value, X became
+=left(W2,len(W2)-1)
+
+But then I decided I wanted to create a formula to find cm, inches, meters, and height with ' and "
+for cm I found all the measurements from 5'3" up to 7'7"
+
+I put into column Y (starting in Y2) each height from 5'03 to 7'07 and converted them to cm in column Z (starting at Z2)
+Then I made each height into their heights of inches only in column AA
+in column AB I put the columns associated with the date it was converted to
+so in column AC1 I put "
+and I created a formula to make it easier to make a formula
+in AC2 I put 
+="=if("&"X2="&AC1&Y2&AC1&", "&Z2&", "
+in AC3 I made this and then filled down
+="if("&"X2="&$AC$1&Y3&$AC$1&", "&Z3&", "
+from there I made a column in AD2 of =AC2
+in column AD3 I created =AD2&AC3
+to merge them together and filled down.
+In AD30, where Y30 is equal to 7'07, I took that value and made this formula to use
+=IF(X2="5'03", 160.02, IF(X2="5'04", 162.56, IF(X2="5'05", 165.1, IF(X2="5'06", 167.64, IF(X2="5'07", 170.18, IF(X2="5'08", 172.72, IF(X2="5'09", 175.26, IF(X2="5'10", 177.8, IF(X2="5'11", 180.34, IF(X2="6'00", 182.88, IF(X2="6'01", 185.42, IF(X2="6'02", 187.96, IF(X2="6'03", 190.5, IF(X2="6'04", 193.04, IF(X2="6'05", 195.58, IF(X2="6'06", 198.12, IF(X2="6'07", 200.66, IF(X2="6'08", 203.2, IF(X2="6'09", 205.74, IF(X2="6'10", 208.28, IF(X2="6'11", 210.82, IF(X2="7'00", 213.36, IF(X2="7'01", 215.9, IF(X2="7'02", 218.44, IF(X2="7'03", 220.98, IF(X2="7'04", 223.52, IF(X2="7'05", 226.06, IF(X2="7'06", 228.6, IF(X2="7'07", 231.14, "")))))))))))))))))))))))))))))
+This gave me the ability to get cm from that.
+now to get inches, all I needed to change were values of what everything equalled in column AC where cm values were meaning Z2
+Z2 was changed to AA2
+and Z3 was changed to AA3 and filled down
+The end result became:
+=IF(X2="5'03", 63, IF(X2="5'04", 64, IF(X2="5'05", 65, IF(X2="5'06", 66, IF(X2="5'07", 67, IF(X2="5'08", 68, IF(X2="5'09", 69, IF(X2="5'10", 70, IF(X2="5'11", 71, IF(X2="6'00", 72, IF(X2="6'01", 73, IF(X2="6'02", 74, IF(X2="6'03", 75, IF(X2="6'04", 76, IF(X2="6'05", 77, IF(X2="6'06", 78, IF(X2="6'07", 79, IF(X2="6'08", 80, IF(X2="6'09", 81, IF(X2="6'10", 82, IF(X2="6'11", 83, IF(X2="7'00", 84, IF(X2="7'01", 85, IF(X2="7'02", 86, IF(X2="7'03", 87, IF(X2="7'04", 88, IF(X2="7'05", 89, IF(X2="7'06", 90, IF(X2="7'07", 91, "")))))))))))))))))))))))))))))
+
+I then decided to make all the formulas easier than converting and chose to do a different approach where I can convert the date value back into a usable value such as (5'3") or cm or inches
+to do date into 0'00" format I did:
+
+
+to do date into cm format I did:
+
+
+and to do date into inches format I did:
+
+
+
+
+
