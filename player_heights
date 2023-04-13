@@ -37,6 +37,7 @@ in column AD3 I created =AD2&AC3
 to merge them together and filled down.
 In AD30, where Y30 is equal to 7'07, I took that value and made this formula to use
 =IF(X2="5'03", 160.02, IF(X2="5'04", 162.56, IF(X2="5'05", 165.1, IF(X2="5'06", 167.64, IF(X2="5'07", 170.18, IF(X2="5'08", 172.72, IF(X2="5'09", 175.26, IF(X2="5'10", 177.8, IF(X2="5'11", 180.34, IF(X2="6'00", 182.88, IF(X2="6'01", 185.42, IF(X2="6'02", 187.96, IF(X2="6'03", 190.5, IF(X2="6'04", 193.04, IF(X2="6'05", 195.58, IF(X2="6'06", 198.12, IF(X2="6'07", 200.66, IF(X2="6'08", 203.2, IF(X2="6'09", 205.74, IF(X2="6'10", 208.28, IF(X2="6'11", 210.82, IF(X2="7'00", 213.36, IF(X2="7'01", 215.9, IF(X2="7'02", 218.44, IF(X2="7'03", 220.98, IF(X2="7'04", 223.52, IF(X2="7'05", 226.06, IF(X2="7'06", 228.6, IF(X2="7'07", 231.14, "")))))))))))))))))))))))))))))
+
 This gave me the ability to get cm from that.
 now to get inches, all I needed to change were values of what everything equalled in column AC where cm values were meaning Z2
 Z2 was changed to AA2
@@ -45,8 +46,8 @@ The end result became:
 =IF(X2="5'03", 63, IF(X2="5'04", 64, IF(X2="5'05", 65, IF(X2="5'06", 66, IF(X2="5'07", 67, IF(X2="5'08", 68, IF(X2="5'09", 69, IF(X2="5'10", 70, IF(X2="5'11", 71, IF(X2="6'00", 72, IF(X2="6'01", 73, IF(X2="6'02", 74, IF(X2="6'03", 75, IF(X2="6'04", 76, IF(X2="6'05", 77, IF(X2="6'06", 78, IF(X2="6'07", 79, IF(X2="6'08", 80, IF(X2="6'09", 81, IF(X2="6'10", 82, IF(X2="6'11", 83, IF(X2="7'00", 84, IF(X2="7'01", 85, IF(X2="7'02", 86, IF(X2="7'03", 87, IF(X2="7'04", 88, IF(X2="7'05", 89, IF(X2="7'06", 90, IF(X2="7'07", 91, "")))))))))))))))))))))))))))))
 
 I then decided to make all the formulas easier than converting and chose to do a different approach where I can convert the date value back into a usable value such as (5'3") or cm or inches
-to do date into 0'00" format I did:
-
+to do date in column P into 0'00" format I did:
+=if(P2="45049", "5'03", if(P2="45050", "5'04", if(P2="45051", "5'05", if(P2="45052", "5'06", if(P2="45053", "5'07", if(P2="45054", "5'08", if(P2="45055", "5'09", if(P2="45056", "5'10", if(P2="45057", "5'11", if(P2="36678", "6'00", if(P2="45078", "6'01", if(P2="45079", "6'02", if(P2="45080", "6'03", if(P2="45081", "6'04", if(P2="45082", "6'05", if(P2="45083", "6'06", if(P2="45084", "6'07", if(P2="45085", "6'08", if(P2="45086", "6'09", if(P2="45087", "6'10", if(P2="45088", "6'11", if(P2="36708", "7'00", if(P2="45108", "7'01", if(P2="45109", "7'02", if(P2="45110", "7'03", if(P2="45111", "7'04", if(P2="45112", "7'05", if(P2="45113", "7'06", if(P2="45114", "7'07", "")))))))))))))))))))))))))))))
 
 to do date into cm format I did:
 
