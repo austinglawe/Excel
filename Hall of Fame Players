@@ -1,0 +1,16 @@
+Players from Basketball Reference that have an * are in the hall of fame
+I wanted to remove that and create a column for those that are in the hall of fame.
+First the player's name is in column G
+for example : 
+Bill Russell*
+Muggsy Bogues
+
+I created a column H and a column I
+column I is going to say "HOF" for those in the Hall of Fame, otherwise it will be blank
+Column H is the name with the asterisk removed
+
+in column H the formula is:
+=IF(RIGHT(G2,1)="*",LEFT(G2,LEN(G2)-1),G2)
+
+in column I the formula is:
+=IF(RIGHT(G2,1="*","HOF","")
