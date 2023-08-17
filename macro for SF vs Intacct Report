@@ -699,7 +699,7 @@ Sub SF_vs_Intacct_Recon_SetUp()
     ' Step 4: Apply Filter and Delete Rows in Intacct Report
     intacctSheet.Activate
     intacctSheet.AutoFilterMode = False ' Clear any existing filters
-    intacctSheet.Range("A1:Y" & lastRowValue).AutoFilter Field:=25, Criteria1:="Delete"
+    intacctSheet.Range("A1:Y" & lastRowValue).AutoFilter field:=25, Criteria1:="Delete"
     
     Dim i As Long
     For i = lastRowValue To 2 Step -1
@@ -735,19 +735,179 @@ Sub SF_vs_Intacct_Recon_SetUp()
     intacctSheet.Cells(2, 7).formula = "=IF(F2=""No PMT-ID"", IF(E2=E1, ""Duplicate"", IF(E3=E2, ""Duplicate"", """" )), IF(F2 = ""No PMT-ID"", """" ,IF(F2=F1, ""Duplicate"", IF(F3=F2, ""Duplicate"", """"))))"
 
    
-   ' Get the last row for G value from Reference Page cell A4
+    ' Get the last row for G value from Reference Page cell A4
 
-   lastRowValue2 = referenceSheet.Range("A4").Value
+    lastRowValue2 = referenceSheet.Range("A4").Value
    
    
-   ' Set the fill-down range for the "Duplicates" column (G2 to G[lastRowValue])
+    ' Set the fill-down range for the "Duplicates" column (G2 to G[lastRowValue])
 
-   Set fillDownRangeG = intacctSheet.Range(intacctSheet.Cells(2, 7), intacctSheet.Cells(lastRowValue2, 7))
+    Set fillDownRangeG = intacctSheet.Range(intacctSheet.Cells(2, 7), intacctSheet.Cells(lastRowValue2, 7))
    
    
-   ' Fill down formulas in the "Duplicates" column
+    ' Fill down formulas in the "Duplicates" column
 
-   fillDownRangeG.FillDown
+    fillDownRangeG.FillDown
+   
+    ' Step 8: Add a filter to row 1
+    intacctSheet.Range("A1:AB1").AutoFilter
+
+    ' Step 9: Change column width
+    intacctSheet.Columns("A:AB").ColumnWidth = 15
+    
+    ' Step 10: Conditional Formatting for Gold
+    intacctSheet.Range("F1,G1,W1,Z:Z,AA:AA,AB:AB").Interior.Color = RGB(255, 237, 1)
+
+    ' Step 11: Go to "Salesforce Report" worksheet
+    ThisWorkbook.Sheets("Salesforce Report").Activate
+    Dim sfSheet As Worksheet
+    Set sfSheet = ThisWorkbook.Sheets("Salesforce Report")
+    
+    ' Set values and formulas for rows 1 in "Salesforce Report" worksheet
+    sfSheet.Range("R1").Value = "..."
+    sfSheet.Range("S1").formula = "=O1"
+    sfSheet.Range("T1").formula = "=C1"
+    sfSheet.Range("U1").formula = "=D1"
+    sfSheet.Range("V1").formula = "=B1"
+    sfSheet.Range("W1").formula = "=K1"
+
+    ' Get the last row from Reference Page
+    Dim lastRowSalesforce As Long
+    lastRowSalesforce = referenceSheet.Range("A9").Value
+
+    ' Fill down formulas in "Salesforce Report" worksheet
+    sfSheet.Range("R1:W1").AutoFill Destination:=sfSheet.Range("R1:W" & lastRowSalesforce), Type:=xlFillDefault
+
+    ' Autofit columns and set specific width for column J
+    sfSheet.Columns.AutoFit
+    sfSheet.Columns("J").ColumnWidth = 50
+
+    ' Highlight specific columns in Gold
+    sfSheet.Range("R:W").Interior.Color = RGB(255, 237, 1)
+
+    ' Click on A1
+    sfSheet.Range("A1").Select
+    
+    ' Step 12: Create_Intacct_PivotTable
+    Dim refCell As Range
+    Dim intacctReportSheet As Worksheet
+    Dim intacctRange As Range
+    Dim pivotSheet As Worksheet
+    Dim pivotCache As pivotCache
+    Dim pivotTable As pivotTable
+    Dim pivotField As pivotField
+     
+    ' Get the reference cell from "Reference Page" A1
+    Set refCell = Worksheets("Reference Page").Range("A1")
+     
+    ' Get the corresponding worksheet ("Intacct Report") and create a range
+    Set intacctReportSheet = Worksheets("Intacct Report")
+    Set intacctRange = intacctReportSheet.Range("A1:" & refCell.Value)
+     
+    ' Copy the range
+    intacctRange.Copy
+     
+    ' Set the destination worksheet for the pivot table
+    Set pivotSheet = Worksheets("SF vs Intacct Variance Analysis")
+     
+    ' Create a pivot cache
+    Set pivotCache = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=intacctRange)
+     
+    ' Create a pivot table
+    Set pivotTable = pivotCache.CreatePivotTable(TableDestination:=pivotSheet.Range("$A$4"))
+     
+    ' Add fields to the pivot table
+    With pivotTable
+        .PivotFields("Payment ID").Orientation = xlRowField
+        .PivotFields("Memo/Description").Orientation = xlRowField
+    
+        ' Modify the "Balance" field for aggregation
+        Set pivotField = .PivotFields("Balance")
+        pivotField.Orientation = xlDataField
+        pivotField.Function = xlSum ' Set the aggregation function here
+        pivotField.NumberFormat = "#,##0.00" ' Optional: Set the number format
+        pivotField.Name = "Sum of Balance" ' Optional: Set the name of the data field
+    End With
+     
+    ' Set the PivotTable layout to tabular form and repeat item labels
+    pivotTable.RowAxisLayout xlTabularRow
+    pivotTable.CompactLayoutRowHeader = "Row headers" ' Repeat item labels
+     
+    ' For each pivot field in the pivot table, repeat all labels if the field is a row field
+    For Each pivotField In pivotTable.PivotFields
+        If pivotField.Orientation = xlRowField Then
+            pivotField.RepeatLabels = True
+        End If
+    Next pivotField
+     
+    ' Remove all subtotals
+    Dim field As pivotField
+    For Each field In pivotTable.PivotFields
+        field.Subtotals(1) = False ' Disable subtotals for each field
+    Next field
+     
+    ' Select cell I4
+    pivotSheet.Range("I4").Select
+    
+    ' Step 13: Create Salesforce PivotTable
+    Dim refCell3 As Range
+    Dim SalesforceReportSheet As Worksheet
+    Dim SalesforceRange As Range
+    Dim pivotSheet3 As Worksheet
+    Dim pivotCache3 As pivotCache
+    Dim pivotTable3 As pivotTable
+    Dim pivotField3 As pivotField
+
+    ' Get the reference cell from "Reference Page" A6
+    Set refCell3 = Worksheets("Reference Page").Range("A6")
+
+    ' Get the corresponding worksheet ("Salesforce Report") and create a range
+    Set SalesforceReportSheet = Worksheets("Salesforce Report")
+    Set SalesforceRange = SalesforceReportSheet.Range("A1:" & refCell3.Value)
+
+    ' Set the destination worksheet for the pivot table
+    Set pivotSheet3 = Worksheets("SF vs Intacct Variance Analysis")
+
+    ' Create a pivot cache
+    Set pivotCache3 = ThisWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=SalesforceRange)
+
+    ' Create a pivot table
+    Set pivotTable3 = pivotCache3.CreatePivotTable(TableDestination:=pivotSheet3.Range("$I$4"))
+
+    ' Add fields to the pivot table
+    With pivotTable3
+        .PivotFields("Payment: Payment Number").Orientation = xlRowField
+        .PivotFields("Opportunity Name").Orientation = xlRowField
+
+        ' Modify the "Payment Amount" field for aggregation
+        Set pivotField3 = .PivotFields("Payment Amount")
+        pivotField3.Orientation = xlDataField
+        pivotField3.Function = xlSum ' Set the aggregation function here
+        pivotField3.NumberFormat = "#,##0.00" ' Optional: Set the number format
+        pivotField3.Name = "Sum of Payment Amount" ' Optional: Set the name of the data field
+    End With
+
+    ' Set the PivotTable layout to tabular form and repeat item labels
+    pivotTable3.RowAxisLayout xlTabularRow
+    pivotTable3.CompactLayoutRowHeader = "Row headers" ' Repeat item labels
+
+    ' For each pivot field in the pivot table, repeat all labels if the field is a row field
+    For Each pivotField3 In pivotTable3.PivotFields
+        If pivotField3.Orientation = xlRowField Then
+            pivotField3.RepeatLabels = True
+        End If
+    Next pivotField3
+
+    ' Remove all subtotals
+    Dim field3 As pivotField
+    For Each field3 In pivotTable3.PivotFields
+        field3.Subtotals(1) = False ' Disable subtotals for each field
+    Next field3
+
+    ' Adjust column width and selection
+    pivotSheet3.Cells.Select
+    Selection.ColumnWidth = 15
+    pivotSheet3.Range("O5").Select
 
 End Sub
 
