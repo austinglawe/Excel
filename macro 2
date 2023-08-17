@@ -1,0 +1,422 @@
+Sub SF_vs_Intacct_Recon_SetUp()
+    
+    ' Step 1: Check if cells are populated
+    If IsEmpty(Range("C1").Value) Or IsEmpty(Range("D1").Value) Or IsEmpty(Range("E1").Value) Or IsEmpty(Range("F1").Value) Or IsEmpty(Range("G1").Value) Then
+        MsgBox "Oops... Please make sure you have put in the data for the Intacct Report AND the Salesforce Report. Then click this button again."
+        Exit Sub
+    End If
+
+    ' Step 2: Unprotect and perform actions
+    If ActiveSheet.Name = "Salesforce Report" Then
+        ' Unprotect "Salesforce Report" sheet
+        ThisWorkbook.Sheets("Salesforce Report").Unprotect
+
+        ' Delete the button in "Salesforce Report" sheet
+        Dim sfButtonShape As Shape
+        On Error Resume Next
+        Set sfButtonShape = ThisWorkbook.Sheets("Salesforce Report").Shapes("Rectangle 1") ' Replace with the actual button name
+        On Error GoTo 0
+        If Not sfButtonShape Is Nothing Then
+            sfButtonShape.Delete
+        End If
+
+        ' Delete column A
+        ThisWorkbook.Sheets("Salesforce Report").Columns("A").Delete
+    ElseIf ActiveSheet.Name = "Intacct Report" Then
+        ' Delete the button in "Intacct Report" sheet
+        Dim intacctButtonShape As Shape
+        On Error Resume Next
+        Set intacctButtonShape = ThisWorkbook.Sheets("Intacct Report").Shapes("Rectangle 1") ' Replace with the actual button name
+        On Error GoTo 0
+        If Not intacctButtonShape Is Nothing Then
+            intacctButtonShape.Delete
+        End If
+
+        ' Unprotect "Intacct Report" sheet
+        ThisWorkbook.Sheets("Intacct Report").Unprotect
+
+        ' Delete column A
+        ThisWorkbook.Sheets("Intacct Report").Columns("A").Delete
+    End If
+
+    ' Step 3: Unhide sheets
+    Worksheets("Summary").Visible = True
+    Worksheets("SF vs Intacct Variance Analysis").Visible = True
+    Worksheets("Reference Page").Visible = True
+
+    ' Populate Reference Page
+    Dim refPageSheet As Worksheet
+    Set refPageSheet = ThisWorkbook.Sheets("Reference Page")
+
+    ' Go to the Reference Page worksheet
+    refPageSheet.Activate
+
+    ' Populate the text and formulas in the specified cells
+    refPageSheet.Range("B1").Value = "Last cell for range in Intacct Pivot Table"
+    refPageSheet.Range("B2").Value = "Link to the Last Cell in B column in the 'Intacct Report' Tab"
+    refPageSheet.Range("B3").Value = "Last cell in B column in the 'Intacct Report' Tab"
+    refPageSheet.Range("B4").Value = "End cell Reference Number - Intacct Report"
+    refPageSheet.Range("B6").Value = "Last cell for range in Salesforce Pivot Table"
+    refPageSheet.Range("B7").Value = "Link to the Last Cell in B column in the 'Salesforce Report' Tab"
+    refPageSheet.Range("B8").Value = "Last cell in B column in the 'Salesforce Report' Tab"
+    refPageSheet.Range("B9").Value = "End Cell Reference Number - Salesforce Report"
+
+    refPageSheet.Range("A1").formula = "=""X""&RIGHT(A3,LEN(A3)-1)"
+    refPageSheet.Range("A2").formula = "=HYPERLINK(""#'Intacct Report'!""&INDIRECT(""'Reference Page'!A3""),""End of Intacct Report Data - ""&'Reference Page'!A3)"
+    refPageSheet.Range("A3").formula = "=ADDRESS(MAX(INDEX(('Intacct Report'!B:B<>"""")*(ROW('Intacct Report'!B:B)), , )), COLUMN('Intacct Report'!B:B), 4)"
+    refPageSheet.Range("A4").formula = "=RIGHT(A3,LEN(A3)-1)"
+    refPageSheet.Range("A6").formula = "=""P""&RIGHT(A8,LEN(A8)-1)"
+    refPageSheet.Range("A7").formula = "=HYPERLINK(""#'Salesforce Report'!""&INDIRECT(""'Reference Page'!A8""),""End of Salesforce Report Data - ""&'Reference Page'!A8)"
+    refPageSheet.Range("A8").formula = "=ADDRESS(MAX(INDEX(('Salesforce Report'!B:B<>"""")*(ROW('Salesforce Report'!B:B)), , )), COLUMN('Salesforce Report'!B:B), 4)"
+  refPageSheet.Range("A9").formula = "=RIGHT(A8,LEN(A8)-1)"
+
+    ' Set other variables and perform further actions
+    Dim intacctSheet As Worksheet
+    Dim referenceSheet As Worksheet
+    Dim lastRowValue As Long
+    Dim fillDownRangeF As Range
+    Dim fillDownRangeG As Range
+    Dim fillDownRangeW As Range
+    Dim fillDownRangeY As Range
+
+    ' Set the target worksheets
+    Set intacctSheet = ThisWorkbook.Sheets("Intacct Report")
+    Set referenceSheet = ThisWorkbook.Sheets("Reference Page")
+
+    ' Insert columns and set headers
+    intacctSheet.Columns("F:G").Insert Shift:=xlToRight
+    intacctSheet.Columns("W:W").Insert Shift:=xlToRight
+    intacctSheet.Columns("Y:Y").Insert Shift:=xlToRight
+
+    intacctSheet.Cells(1, 1).Value = "Account"
+    intacctSheet.Cells(1, 6).Value = "Payment ID"
+    intacctSheet.Cells(1, 7).Value = "Duplicates"
+    intacctSheet.Cells(1, 23).Value = "Balance"
+    intacctSheet.Cells(1, 24).Value = "C. Balance"
+    intacctSheet.Cells(1, 25).Value = "keep or delete"
+
+    intacctSheet.Cells(2, 6).formula = "=IFERROR(TRIM(MID(E2, FIND(""PMT"", E2), FIND("" "", E2, FIND(""PMT"", E2)) - FIND(""PMT"", E2))),""No PMT-ID"")"
+    intacctSheet.Cells(2, 7).formula = "=IF(F2=""No PMT-ID"", IF(E2="""",""Duplicate"", IF(E3=E2, ""Duplicate"", """" )), IF(F2="""",""Duplicate"", IF(F3=F2, ""Duplicate"", """")))"
+    intacctSheet.Cells(2, 23).formula = "=U2-V2"
+    intacctSheet.Cells(2, 25).formula = "=IF(C2="""",""Delete"",""Keep"")"
+
+    ' Get the last row value from Reference Page
+    lastRowValue = referenceSheet.Range("A4").Value
+
+    ' Set the fill-down range for the "Balance" column
+    Set fillDownRangeW = intacctSheet.Range(intacctSheet.Cells(2, 23), intacctSheet.Cells(lastRowValue, 23))
+    fillDownRangeW.FillDown
+
+    ' Set the fill-down range for the "Payment ID" column
+        Set fillDownRangeF = intacctSheet.Range(intacctSheet.Cells(2, 6), intacctSheet.Cells(lastRowValue, 6))
+    fillDownRangeF.FillDown
+
+    ' Set the fill-down range for the "keep or delete" column
+    Set fillDownRangeY = intacctSheet.Range(intacctSheet.Cells(2, 25), intacctSheet.Cells(lastRowValue, 25))
+    fillDownRangeY.FillDown
+
+    ' Step 4: Apply Filter and Delete Rows in Intacct Report
+    intacctSheet.Activate
+    intacctSheet.AutoFilterMode = False ' Clear any existing filters
+    intacctSheet.Range("A1:Y" & lastRowValue).AutoFilter field:=25, Criteria1:="Delete"
+    
+    Dim i As Long
+    For i = lastRowValue To 2 Step -1
+        If intacctSheet.Cells(i, 25).Value = "Delete" Then
+            intacctSheet.Rows(i).Delete
+        End If
+    Next i
+    
+    intacctSheet.AutoFilterMode = False
+    intacctSheet.Columns("Y").Delete
+
+    ' Step 5: Sort and Conditional Formatting
+    intacctSheet.Range("A1:W" & lastRowValue).Sort Key1:=intacctSheet.Range("F1"), Order1:=xlAscending, Header:=xlYes, Key2:=intacctSheet.Range("G1"), Order2:=xlAscending, Header:=xlYes
+    intacctSheet.Range("G2:G" & lastRowValue).FormatConditions.Add Type:=xlTextString, String:="Duplicate", TextOperator:=xlContains
+    intacctSheet.Range("G2:G" & lastRowValue).FormatConditions(1).Interior.Color = RGB(255, 0, 0)
+
+    ' Step 6: Populate Additional Data
+    intacctSheet.Range("Z1").Value = "Memo/Description - 2"
+    intacctSheet.Range("AA1").Value = "Posted dt. - 2"
+    intacctSheet.Range("AB1").Value = "Doc dt. - 2"
+    intacctSheet.Range("Z2").formula = "=E2"
+    intacctSheet.Range("AA2").formula = "=B2"
+    intacctSheet.Range("AB2").formula = "=C2"
+    intacctSheet.Range("Z2:Z" & lastRowValue).FillDown
+    intacctSheet.Range("AA2:AA" & lastRowValue).FillDown
+    intacctSheet.Range("AB2:AB" & lastRowValue).FillDown
+
+    ' Step 7: Return to A1 of Intacct Report
+    intacctSheet.Range("A1").Select
+    
+    
+    ' Set formula in the first cell of the new "Duplicates" column (G2)
+    intacctSheet.Cells(2, 7).formula = "=IF(F2=""No PMT-ID"", IF(E2=E1, ""Duplicate"", IF(E3=E2, ""Duplicate"", """" )), IF(F2 = ""No PMT-ID"", """" ,IF(F2=F1, ""Duplicate"", IF(F3=F2, ""Duplicate"", """"))))"
+
+   
+    ' Get the last row for G value from Reference Page cell A4
+
+    lastRowValue2 = referenceSheet.Range("A4").Value
+   
+   
+    ' Set the fill-down range for the "Duplicates" column (G2 to G[lastRowValue])
+
+    Set fillDownRangeG = intacctSheet.Range(intacctSheet.Cells(2, 7), intacctSheet.Cells(lastRowValue2, 7))
+   
+   
+    ' Fill down formulas in the "Duplicates" column
+
+    fillDownRangeG.FillDown
+   
+    ' Step 8: Add a filter to row 1
+    intacctSheet.Range("A1:AB1").AutoFilter
+
+    ' Step 9: Change column width
+    intacctSheet.Columns("A:AB").ColumnWidth = 15
+    
+    ' Step 10: Conditional Formatting for Gold
+    intacctSheet.Range("F1,G1,W1,Z:Z,AA:AA,AB:AB").Interior.Color = RGB(255, 237, 1)
+
+    ' Step 11: Go to "Salesforce Report" worksheet
+    ThisWorkbook.Sheets("Salesforce Report").Activate
+    Dim sfSheet As Worksheet
+    Set sfSheet = ThisWorkbook.Sheets("Salesforce Report")
+    
+    ' Set values and formulas for rows 1 in "Salesforce Report" worksheet
+    sfSheet.Range("R1").Value = "..."
+    sfSheet.Range("S1").formula = "=O1"
+    sfSheet.Range("T1").formula = "=C1"
+    sfSheet.Range("U1").formula = "=D1"
+    sfSheet.Range("V1").formula = "=B1"
+    sfSheet.Range("W1").formula = "=K1"
+
+    ' Get the last row from Reference Page
+    Dim lastRowSalesforce As Long
+    lastRowSalesforce = referenceSheet.Range("A9").Value
+
+    ' Fill down formulas in "Salesforce Report" worksheet
+    sfSheet.Range("R1:W1").AutoFill Destination:=sfSheet.Range("R1:W" & lastRowSalesforce), Type:=xlFillDefault
+
+    ' Autofit columns and set specific width for column J
+    sfSheet.Columns.AutoFit
+    sfSheet.Columns("J").ColumnWidth = 50
+
+    ' Highlight specific columns in Gold
+    sfSheet.Range("R:W").Interior.Color = RGB(255, 237, 1)
+
+    ' Click on A1
+    sfSheet.Range("A1").Select
+    
+    ' Step 12: Create_Intacct_PivotTable
+    Dim refCell As Range
+    Dim intacctReportSheet As Worksheet
+    Dim intacctRange As Range
+    Dim pivotSheet As Worksheet
+    Dim pivotCache As pivotCache
+    Dim pivotTable As pivotTable
+    Dim pivotField As pivotField
+     
+    ' Get the reference cell from "Reference Page" A1
+    Set refCell = Worksheets("Reference Page").Range("A1")
+     
+    ' Get the corresponding worksheet ("Intacct Report") and create a range
+    Set intacctReportSheet = Worksheets("Intacct Report")
+    Set intacctRange = intacctReportSheet.Range("A1:" & refCell.Value)
+     
+    ' Copy the range
+    intacctRange.Copy
+     
+    ' Set the destination worksheet for the pivot table
+    Set pivotSheet = Worksheets("SF vs Intacct Variance Analysis")
+     
+    ' Create a pivot cache
+    Set pivotCache = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=intacctRange)
+     
+    ' Create a pivot table
+    Set pivotTable = pivotCache.CreatePivotTable(TableDestination:=pivotSheet.Range("$A$4"))
+     
+    ' Add fields to the pivot table
+    With pivotTable
+        .PivotFields("Payment ID").Orientation = xlRowField
+        .PivotFields("Memo/Description").Orientation = xlRowField
+    
+        ' Modify the "Balance" field for aggregation
+        Set pivotField = .PivotFields("Balance")
+        pivotField.Orientation = xlDataField
+        pivotField.Function = xlSum ' Set the aggregation function here
+        pivotField.NumberFormat = "#,##0.00" ' Optional: Set the number format
+        pivotField.Name = "Sum of Balance" ' Optional: Set the name of the data field
+    End With
+     
+    ' Set the PivotTable layout to tabular form and repeat item labels
+    pivotTable.RowAxisLayout xlTabularRow
+    pivotTable.CompactLayoutRowHeader = "Row headers" ' Repeat item labels
+     
+    ' For each pivot field in the pivot table, repeat all labels if the field is a row field
+    For Each pivotField In pivotTable.PivotFields
+        If pivotField.Orientation = xlRowField Then
+            pivotField.RepeatLabels = True
+        End If
+    Next pivotField
+     
+    ' Remove all subtotals
+    Dim field As pivotField
+    For Each field In pivotTable.PivotFields
+        field.Subtotals(1) = False ' Disable subtotals for each field
+    Next field
+     
+    
+    ' Step 13: Create Salesforce PivotTable
+    Dim refCell3 As Range
+    Dim SalesforceReportSheet As Worksheet
+    Dim SalesforceRange As Range
+    Dim pivotSheet3 As Worksheet
+    Dim pivotCache3 As pivotCache
+    Dim pivotTable3 As pivotTable
+    Dim pivotField3 As pivotField
+
+    ' Get the reference cell from "Reference Page" A6
+    Set refCell3 = Worksheets("Reference Page").Range("A6")
+
+    ' Get the corresponding worksheet ("Salesforce Report") and create a range
+    Set SalesforceReportSheet = Worksheets("Salesforce Report")
+    Set SalesforceRange = SalesforceReportSheet.Range("A1:" & refCell3.Value)
+
+    ' Set the destination worksheet for the pivot table
+    Set pivotSheet3 = Worksheets("SF vs Intacct Variance Analysis")
+
+    ' Create a pivot cache
+    Set pivotCache3 = ThisWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=SalesforceRange)
+
+    ' Create a pivot table
+    Set pivotTable3 = pivotCache3.CreatePivotTable(TableDestination:=pivotSheet3.Range("$I$4"))
+
+    ' Add fields to the pivot table
+    With pivotTable3
+        .PivotFields("Payment: Payment Number").Orientation = xlRowField
+        .PivotFields("Opportunity Name").Orientation = xlRowField
+
+        ' Modify the "Payment Amount" field for aggregation
+        Set pivotField3 = .PivotFields("Payment Amount")
+        pivotField3.Orientation = xlDataField
+        pivotField3.Function = xlSum ' Set the aggregation function here
+        pivotField3.NumberFormat = "#,##0.00" ' Optional: Set the number format
+        pivotField3.Name = "Sum of Payment Amount" ' Optional: Set the name of the data field
+    End With
+
+    ' Set the PivotTable layout to tabular form and repeat item labels
+    pivotTable3.RowAxisLayout xlTabularRow
+    pivotTable3.CompactLayoutRowHeader = "Row headers" ' Repeat item labels
+
+    ' For each pivot field in the pivot table, repeat all labels if the field is a row field
+    For Each pivotField3 In pivotTable3.PivotFields
+        If pivotField3.Orientation = xlRowField Then
+            pivotField3.RepeatLabels = True
+        End If
+    Next pivotField3
+
+    ' Remove all subtotals
+    Dim field3 As pivotField
+    For Each field3 In pivotTable3.PivotFields
+        field3.Subtotals(1) = False ' Disable subtotals for each field
+    Next field3
+
+    ' Activate the pivotSheet3 worksheet
+    pivotSheet3.Activate
+    
+    ' Adjust column width for all cells in the worksheet
+    pivotSheet3.Cells.ColumnWidth = 15
+    
+    ' Select a specific cell (e.g., O5)
+    pivotSheet3.Range("O5").Select
+    
+    ' Calculate the last row for filling down
+    Dim lastRow As Long
+    lastRow = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Evaluate("MAX(IF(A:A<>"""", ROW(A:A)))")
+    
+    ' Calculate the last row for columns J
+    Dim lastRowJ As Long
+    lastRowJ = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Evaluate("MAX(IF(I:I<>"""", ROW(I:I)))")
+    
+    ' Fill down formulas in columns D, E, F, G
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("D5:D" & lastRow).formula = "=IFERROR(VLOOKUP(A5,$I$4:INDIRECT($K$1),3,0),0)"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("E5:E" & lastRow).formula = "=C5+D5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("F5:F" & lastRow).formula = "=A5&""_""&B5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("G5:G" & lastRow).formula = "=IF(A5=""Grand Total"",""Don't Use"",IF(E5=0,""Don’t Use"",""Use""))"
+    
+    ' Fill down formulas in columns L, M, N, O
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("L5:L" & lastRowJ).formula = "=IFERROR(VLOOKUP(I5,$A$4:INDIRECT($C$1),3,0),0)"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("M5:M" & lastRowJ).formula = "=K5+L5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("N5:N" & lastRowJ).formula = "=I5&""_""&J5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("O5:O" & lastRowJ).formula = "=IF(I5=""Grand Total"",""Don't Use"",IF(M5=0,""Don’t Use"",""Use""))"
+
+    ' Step 14: Copy and Paste Values from "SF vs Intacct Variance Analysis" to "Summary" worksheet
+    Dim summarySheet As Worksheet
+    Set summarySheet = ThisWorkbook.Sheets("Summary")
+
+    Dim sfVsIntacctSheet As Worksheet
+    Set sfVsIntacctSheet = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis")
+
+    Dim lastRowSFvsIntacct As Long
+    lastRowSFvsIntacct = sfVsIntacctSheet.Cells(sfVsIntacctSheet.Rows.Count, "G").End(xlUp).Row
+
+    Dim copyRow As Long
+    Dim pasteRow As Long
+    copyRow = 5 ' Starting row in "SF vs Intacct Variance Analysis" to copy from
+    pasteRow = 4 ' Row in "Summary" worksheet to paste into
+
+    ' Loop through each row in the "SF vs Intacct Variance Analysis" sheet and check column G
+    For copyRow = 5 To lastRowSFvsIntacct
+        If sfVsIntacctSheet.Cells(copyRow, "G").Value = "Use" Then
+            ' Copy values from columns E and F
+            Dim valueE As Variant
+            Dim valueF As Variant
+            valueE = sfVsIntacctSheet.Cells(copyRow, "E").Value
+            valueF = sfVsIntacctSheet.Cells(copyRow, "F").Value
+
+            ' Paste values into "Summary" worksheet
+            summarySheet.Cells(pasteRow, "D").Value = valueE
+            summarySheet.Cells(pasteRow, "F").Value = valueF
+
+            pasteRow = pasteRow + 1 ' Move to the next row in "Summary" for pasting
+        End If
+    Next copyRow
+    
+       ' Step 14 (Continuation): Copy and Paste Additional Values from "SF vs Intacct Variance Analysis" to "Summary" worksheet
+    Dim lastRowSummary As Long
+    lastRowSummary = summarySheet.Evaluate("MAX(IF(C:C<>"""", ROW(C:C)))") + 1
+
+    Dim copyRow2 As Long
+    Dim pasteRow2 As Long
+    copyRow2 = 5 ' Starting row in "SF vs Intacct Variance Analysis" to copy from
+
+    ' Loop through each row in the "SF vs Intacct Variance Analysis" sheet and check column O
+    For copyRow2 = 5 To lastRowSFvsIntacct
+        If sfVsIntacctSheet.Cells(copyRow2, "O").Value = "Use" Then
+            ' Copy values from columns M and N
+            Dim valueM As Variant
+            Dim valueN As Variant
+            valueM = sfVsIntacctSheet.Cells(copyRow2, "M").Value
+            valueN = sfVsIntacctSheet.Cells(copyRow2, "N").Value
+
+            ' Calculate the row to paste in the "Summary" worksheet
+            Dim lastRowF As Long
+            lastRowF = summarySheet.Evaluate("MAX(IF(F:F<>"""", ROW(F:F)))") + 1
+
+            ' Paste values into "Summary" worksheet
+            summarySheet.Cells(lastRowF, "C").Value = valueM
+            summarySheet.Cells(lastRowF, "D").Value = valueN
+
+            ' Copy values from column D to column F in "Summary" worksheet
+            summarySheet.Cells(lastRowF, "F").Value = summarySheet.Cells(lastRowF, "D").Value
+
+            ' Update lastRowF to account for the new data pasted
+            lastRowF = lastRowF + 1
+
+            ' Move to the next row in "Summary" for potential future pasting
+            pasteRow2 = pasteRow2 + 1
+        End If
+    Next copyRow2
+
+End Sub
+
