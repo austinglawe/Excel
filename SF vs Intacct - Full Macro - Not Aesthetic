@@ -1,23 +1,17 @@
 
-Sub COMPLETE_RESET()
+Sub Step0_COMPLETE_RESET()
     Dim userResponse As VbMsgBoxResult
     Dim ws As Worksheet
     Dim quotation As String
-
- 
 
     ' Prompt the user for confirmation with custom styling
     userResponse = MsgBox("Are you sure you want to reset the workbook? This will erase all data and reset it back to the starting point.", _
                           vbYesNo + vbExclamation + vbDefaultButton2, "Confirm Reset")
 
- 
-
     ' Check user's response
     If userResponse = vbYes Then
         ' Add a new worksheet called "reset"
         ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)).Name = "reset"
-
- 
 
         ' Delete all existing worksheets except for "reset"
         Application.DisplayAlerts = False
@@ -28,24 +22,20 @@ Sub COMPLETE_RESET()
         Next ws
         Application.DisplayAlerts = True
 
- 
 
         ' Rename "reset" tab to "Summary"
         ThisWorkbook.Sheets("reset").Name = "Summary"
 
- 
 
         ' Add new worksheets
         ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)).Name = "SF vs Intacct Variance Analysis"
         ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)).Name = "Reference Page"
 
- 
 
         ' Set the target worksheet for formatting and formulas
         Set ws = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis")
 
  
-
         ' Format A2:F2
         ws.Range("A2:F2").Merge
         ws.Range("A2:F2").HorizontalAlignment = xlCenter
@@ -54,8 +44,6 @@ Sub COMPLETE_RESET()
         ws.Range("A2:F2").Value = "(Columns in order - Payment ID, Memo/Description; Rows in order - [Sum of] Balance)"
 
 
- 
-
         ' Format I2:N2
         ws.Range("I2:N2").Merge
         ws.Range("I2:N2").HorizontalAlignment = xlCenter
@@ -63,42 +51,27 @@ Sub COMPLETE_RESET()
         ws.Range("I2:N2").Font.Color = RGB(0, 0, 0) ' Black color
         ws.Range("I2:N2").Value = "(Columns in order - Payment: Payment Number, Opportunity Name; Row - [Sum of] Payment Amount)"
 
- 
-
- 
 
         ' Format B1
         ws.Range("B1").Interior.Color = RGB(79, 129, 189) ' Bright blue
         quotation = """"
         ws.Range("B1").formula = "!=ADDRESS(MAX(IF(A:A<>" & quotation & quotation & ", ROW(A:A)-1)), COLUMN(A:A), 4)"
 
- 
-
- 
 
         ' Format J1
         ws.Range("J1").Interior.Color = RGB(79, 129, 189) ' Bright blue
         ws.Range("J1").formula = "!=ADDRESS(MAX(IF(I:I<>" & quotation & quotation & ", ROW(I:I)-1)), COLUMN(I:I), 4)"
 
- 
-
- 
 
         ' Format K1
         ws.Range("K1").Interior.Color = RGB(146, 208, 80) ' Dull green
         ws.Range("K1").formula = "=""K""&RIGHT(J1,LEN(J1)-1)"
 
- 
-
- 
 
         ' Format C1
         ws.Range("C1").Interior.Color = RGB(146, 208, 80) ' Dull green
         ws.Range("C1").formula = "=""C""&RIGHT(B1,LEN(B1)-1)"
 
- 
-
- 
 
         ' Format A3:C3
         ws.Range("A3:C3").Merge
@@ -106,9 +79,6 @@ Sub COMPLETE_RESET()
         ws.Range("A3:C3").Interior.Color = RGB(255, 255, 0) ' Bright yellow color
         ws.Range("A3:C3").Value = "\/ Insert Intacct Pivot Table below (in A4)"
 
- 
-
- 
 
         ' Format I3:K3
         ws.Range("I3:K3").Merge
@@ -116,9 +86,6 @@ Sub COMPLETE_RESET()
         ws.Range("I3:K3").Interior.Color = RGB(255, 255, 0) ' Bright yellow color
         ws.Range("I3:K3").Value = "\/ Insert Salesforce Pivot Table below (in I4)"
 
- 
-
- 
 
         ' Format D3, E3, F3, L3, M3, N3
         ws.Range("D3").Value = "Salesforce Comparison"
@@ -131,8 +98,6 @@ Sub COMPLETE_RESET()
         ws.Range("O3").Value = "Use in Summary Page"
  
 
- 
-
         ' Set formulas in D5:N5
         ws.Range("D5").formula = "=IFERROR(VLOOKUP(A5,$I$4:INDIRECT($K$1),3,0),0)"
         ws.Range("E5").formula = "=C5+D5"
@@ -141,42 +106,25 @@ Sub COMPLETE_RESET()
         ws.Range("M5").formula = "=K5+L5"
         ws.Range("N5").formula = "=I5&" & Chr(34) & "_" & Chr(34) & "&J5"
 
- 
-
- 
 
         ' Apply filters to A3:N3
         ws.Range("A3:O3").AutoFilter
 
- 
-
- 
 
         ' Set column width to 15.00 (110 pixels)
         ws.Columns("A:N").ColumnWidth = 15#
 
- 
-
- 
 
         ' Activate the "SF vs Intacct Variance Analysis" sheet and go to cell A1
         ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Activate
         ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("A1").Select
 
- 
-
- 
 
         ' Turn on screen updating to see the changes
         Application.ScreenUpdating = True
 
- 
-
- 
 
         ' Remove ! From the formulas in B1 and J1
-
- 
 
          Range("B1").Select
          ActiveCell.Formula2R1C1 = _
@@ -225,20 +173,6 @@ Sub COMPLETE_RESET()
         summarySheet.Range("D3").formula = "=IFERROR(GETPIVOTDATA(""Payment Amount"",'SF vs Intacct Variance Analysis'!$I$4),)"
         summarySheet.Range("A3").formula = "=D3-C3"
 
-        ' Check the value in cell C3 and apply highlighting if it's 0
-        If summarySheet.Range("C3").Value = 0 Then
-            summarySheet.Range("C3").Interior.Color = RGB(255, 0, 0) ' Red color
-        Else
-            summarySheet.Range("C3").Interior.ColorIndex = xlNone ' Remove any previous highlighting
-        End If
-
-        ' Check the value in cell D3 and apply highlighting if it's 0
-        If summarySheet.Range("D3").Value = 0 Then
-            summarySheet.Range("D3").Interior.Color = RGB(255, 0, 0) ' Red color
-        Else
-            summarySheet.Range("D3").Interior.ColorIndex = xlNone ' Remove any previous highlighting
-        End If
-
         ' Create Recon Worksheet And Hide Others
         Dim newWorksheet As Worksheet
 
@@ -252,8 +186,6 @@ Sub COMPLETE_RESET()
                 ws.Visible = xlSheetHidden
             End If
         Next ws
-
- 
 
         ' Insert Button
         Dim buttonShape As Shape
@@ -269,7 +201,7 @@ Sub COMPLETE_RESET()
         Set buttonShape = ws.Shapes.AddShape(msoShapeRectangle, 0, 0, 900, 500)
         buttonText = "Click Here to Start" & vbCrLf & "Intacct vs. Salesforce" & vbCrLf & "Reconciliation"
         With buttonShape
-            .OnAction = "Insert_SF_or_Intacct_Report"
+            .OnAction = "Step1_Insert_SF_or_Intacct_Report"
             .TextFrame.Characters.Text = buttonText
             .TextFrame.Characters.Font.Name = "Sagona ExtraLight"
             .TextFrame.Characters.Font.FontStyle = "Bold"
@@ -292,16 +224,14 @@ Sub COMPLETE_RESET()
         ' Activate cell T1
         ws.Range("T1").Activate
 
- 
-
- 
-
     End If
 End Sub
 
- 
 
-Sub Insert_SF_or_Intacct_Report()
+
+ 
+
+Sub Step1_Insert_SF_or_Intacct_Report()
     Dim userResponse As VbMsgBoxResult
     Dim intacctSheet As Worksheet
     Dim sfSheet As Worksheet
@@ -364,13 +294,13 @@ Sub Insert_SF_or_Intacct_Report()
             .TextFrame.Characters.Font.Bold = True
             .TextFrame.HorizontalAlignment = xlCenter
             .TextFrame.VerticalAlignment = xlCenter
-            .OnAction = "Import_SF_after_Intacct" ' Update macro name
+            .OnAction = "Step2a_Import_SF_after_Intacct" ' Update macro name
         End With
 
         ' Scale the button and move to B1
         buttonShape.LockAspectRatio = msoFalse
         buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
-        buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
+        buttonShape.ScaleHeight 4.5, msoFalse, msoScaleFromBottomRight
         intacctSheet.Range("B1").Select
 
         ' Protect the Intacct Report sheet
@@ -390,7 +320,6 @@ Sub Insert_SF_or_Intacct_Report()
         ' Click on cell B1
         intacctSheet.Range("B1").Select
 
- 
 
     ElseIf userResponse = vbNo Then
         ' Check if the Salesforce Report is available
@@ -445,13 +374,13 @@ Sub Insert_SF_or_Intacct_Report()
                 .TextFrame.Characters.Font.Bold = True
                 .TextFrame.HorizontalAlignment = xlCenter
                 .TextFrame.VerticalAlignment = xlCenter
-                .OnAction = "Import_Intacct_after_SF"
+                .OnAction = "Step2b_Import_Intacct_after_SF"
             End With
 
             ' Scale the button and move to B1
             buttonShape.LockAspectRatio = msoFalse
             buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
-            buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
+            buttonShape.ScaleHeight 4.5, msoFalse, msoScaleFromBottomRight
             sfSheet.Range("B1").Select
 
             ' Protect the Salesforce Report sheet
@@ -470,8 +399,7 @@ Sub Insert_SF_or_Intacct_Report()
 
             ' Click on cell B1
             sfSheet.Range("B1").Select
-
- 
+            
 
         ElseIf userResponse = vbNo Then
             MsgBox "Please Download those reports and have them ready! Then press this button to get started.", vbInformation, "Reports Not Available"
@@ -479,111 +407,297 @@ Sub Insert_SF_or_Intacct_Report()
         End If
     End If
 End Sub
+ 
 
- 
-
- 
-
-Sub Import_SF_after_Intacct()
-    ' Delete the button in "Intacct Report" sheet
-    Dim intacctButtonShape As Shape
-    On Error Resume Next
-    Set intacctButtonShape = ThisWorkbook.Sheets("Intacct Report").Shapes("Rectangle 1") ' Replace with the actual button name
-    On Error GoTo 0
-    If Not intacctButtonShape Is Nothing Then
-        intacctButtonShape.Delete
-    End If
-
-    ' Unprotect "Intacct Report" sheet
-    ThisWorkbook.Sheets("Intacct Report").Unprotect
-
-    ' Delete column A
-    ThisWorkbook.Sheets("Intacct Report").Columns("A").Delete
-
+Sub Step2a_Import_SF_after_Intacct()
+    Dim intacctSheet As Worksheet
     Dim sfSheet As Worksheet
-    Dim reconStartSheet As Worksheet
+    Dim intacctButtonShape As Shape
     Dim buttonShape As Shape
     Dim buttonText As String
 
-    ' Create a new sheet for "Salesforce Report"
-    Set sfSheet = ThisWorkbook.Sheets.Add
-    sfSheet.Name = "Salesforce Report"
-    sfSheet.Activate
-    sfSheet.Range("A1").Select
+    ' Get reference to "Intacct Report" sheet
+    Set intacctSheet = ThisWorkbook.Sheets("Intacct Report")
 
-    ' Delete "SF vs Intacct Recon Start" sheet
-    Application.DisplayAlerts = False ' Prevent deletion confirmation
-    On Error Resume Next ' Ignore error if sheet doesn't exist
-    ThisWorkbook.Sheets("SF vs Intacct Recon Start").Delete
-    On Error GoTo 0 ' Reset error handling
-    Application.DisplayAlerts = True
+    ' Check if all required headers are present in the Intacct Report
+    If intacctSheet.Cells(1, "C").Value = "Posted dt." And _
+       intacctSheet.Cells(1, "D").Value = "Doc dt." And _
+       intacctSheet.Cells(1, "E").Value = "Doc" And _
+       intacctSheet.Cells(1, "F").Value = "Memo/Description" And _
+       intacctSheet.Cells(1, "K").Value = "Vendor" And _
+       intacctSheet.Cells(1, "M").Value = "Employee" And _
+       intacctSheet.Cells(1, "O").Value = "Location name" And _
+       intacctSheet.Cells(1, "S").Value = "JNL" Then
 
-    ' Format cell A1 on "Salesforce Report"
-    With sfSheet.Range("A1")
-        .Value = "Insert Here>>>"
-        .Font.Name = "Calibri Light"
-        .Font.Size = 11
-        .Font.Underline = xlUnderlineStyleSingle
-        .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
-        .Font.Bold = True
-    End With
+        ' Delete the button in "Intacct Report" sheet
+        On Error Resume Next
+        Set intacctButtonShape = intacctSheet.Shapes("Rectangle 1")
+        On Error GoTo 0
+        If Not intacctButtonShape Is Nothing Then
+            intacctButtonShape.Delete
+        End If
 
-    ' Merge and format cells A2:A7
-    With sfSheet.Range("A2:A7")
-        .Merge
-        .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
-        .Font.Name = "Calibri Light"
-        .Font.Size = 10
-        .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
-        .WrapText = True
-        .HorizontalAlignment = xlCenter
-        .VerticalAlignment = xlCenter
-    End With
+        ' Unprotect "Intacct Report" sheet
+        intacctSheet.Unprotect
 
-    ' Adjust column A width and button placement
-    sfSheet.Columns("A").ColumnWidth = 15 ' Adjusted to 15
-    sfSheet.Activate
-    Set buttonShape = sfSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50) ' Adjust size as needed
-    buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Start SF vs Intacct Recon Now"
-    With buttonShape
-        .Left = sfSheet.Range("A10").Left ' Adjusted to A10
-        .Top = sfSheet.Range("A10").Top + sfSheet.Range("A10:A19").Height ' Adjusted to A20
-        .Width = sfSheet.Range("A10:A19").Width ' Adjusted range
-        .TextFrame.Characters.Text = buttonText
-        .TextFrame.Characters.Font.Name = "Calibri Light"
-        .TextFrame.Characters.Font.Size = 11
-        .TextFrame.Characters.Font.Color = RGB(255, 255, 0) ' Yellow color
-        .TextFrame.Characters.Font.Bold = True
-        .TextFrame.HorizontalAlignment = xlCenter
-        .TextFrame.VerticalAlignment = xlCenter
-        .OnAction = "SF_vs_Intacct_Recon_SetUp"
-    End With
+        ' Delete column A
+        intacctSheet.Columns("A").Delete
 
-    ' Scale the button and move to B1
-    buttonShape.LockAspectRatio = msoFalse
-    buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
-    buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
-    sfSheet.Range("B1").Select
+        ' Create a new sheet for "Salesforce Report"
+        Set sfSheet = ThisWorkbook.Sheets.Add
+        sfSheet.Name = "Salesforce Report"
+        sfSheet.Activate
+        sfSheet.Range("A1").Select
 
-    ' Protect the "Salesforce Report" sheet
-    Cells.Select
-    Selection.Locked = False
-    Selection.FormulaHidden = False
-    Columns("A:A").Select
-    Selection.Locked = True
-    Selection.FormulaHidden = False
-    sfSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
-        False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
-        AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
-        :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
-        AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
-        AllowUsingPivotTables:=True
+        ' Delete "SF vs Intacct Recon Start" sheet
+        Application.DisplayAlerts = False
+        On Error Resume Next
+        ThisWorkbook.Sheets("SF vs Intacct Recon Start").Delete
+        On Error GoTo 0
+        Application.DisplayAlerts = True
 
-    ' Click on cell B1
-    sfSheet.Range("B1").Select
+        ' Format cell A1 on "Salesforce Report"
+        With sfSheet.Range("A1")
+            .Value = "Insert Here>>>"
+            .Font.Name = "Calibri Light"
+            .Font.Size = 11
+            .Font.Underline = xlUnderlineStyleSingle
+            .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+            .Font.Bold = True
+        End With
+
+        ' Merge and format cells A2:A7
+        With sfSheet.Range("A2:A7")
+            .Merge
+            .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
+            .Font.Name = "Calibri Light"
+            .Font.Size = 10
+            .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+            .WrapText = True
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+        End With
+
+        ' Adjust column A width and button placement
+        sfSheet.Columns("A").ColumnWidth = 15 ' Adjusted to 15
+        sfSheet.Activate
+        Set buttonShape = sfSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50) ' Adjust size as needed
+        buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Start SF vs Intacct Recon Now"
+        With buttonShape
+            .Left = sfSheet.Range("A10").Left ' Adjusted to A10
+            .Top = sfSheet.Range("A10").Top + sfSheet.Range("A10:A19").Height ' Adjusted to A20
+            .Width = sfSheet.Range("A10:A19").Width ' Adjusted range
+            .TextFrame.Characters.Text = buttonText
+            .TextFrame.Characters.Font.Name = "Calibri Light"
+            .TextFrame.Characters.Font.Size = 11
+            .TextFrame.Characters.Font.Color = RGB(255, 255, 0) ' Yellow color
+            .TextFrame.Characters.Font.Bold = True
+            .TextFrame.HorizontalAlignment = xlCenter
+            .TextFrame.VerticalAlignment = xlCenter
+            .OnAction = "Step3_SF_vs_Intacct_Recon_SetUp"
+        End With
+
+        ' Scale the button and move to B1
+        buttonShape.LockAspectRatio = msoFalse
+        buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
+        buttonShape.ScaleHeight 4.5, msoFalse, msoScaleFromBottomRight
+        sfSheet.Range("B1").Select
+
+        ' Protect the "Salesforce Report" sheet
+        Cells.Select
+        Selection.Locked = False
+        Selection.FormulaHidden = False
+        Columns("A:A").Select
+        Selection.Locked = True
+        Selection.FormulaHidden = False
+        sfSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
+            False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
+            AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
+            :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
+            AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
+            AllowUsingPivotTables:=True
+
+        ' Click on cell B1
+        sfSheet.Range("B1").Select
+
+    ElseIf intacctSheet.Cells(1, "C").Value = "Close Date" And _
+           intacctSheet.Cells(1, "D").Value = "Account Name" Then
+           
+        ' Delete contents in columns B:Z on "Intacct Report"
+        intacctSheet.Range("B:Z").ClearContents
+
+        ' Show a message box
+        MsgBox "Oops... I think you may have put in the Salesforce Report Data." & vbCrLf & _
+               "Please get the Intacct Data and try again!", vbExclamation, "Data Mismatch"
+
+        ' Select cell B1 on "Intacct Report"
+        intacctSheet.Range("B1").Select
+
+    Else
+        ' Delete contents in columns B:Z on "Intacct Report"
+        intacctSheet.Range("B:Z").ClearContents
+
+        ' Show different messages based on the conditions
+        If intacctSheet.Cells(1, "C").Value <> "Posted dt." Or _
+           intacctSheet.Cells(1, "D").Value <> "Doc dt." Or _
+           intacctSheet.Cells(1, "E").Value <> "Doc" Or _
+           intacctSheet.Cells(1, "F").Value <> "Memo/Description" Or _
+           intacctSheet.Cells(1, "K").Value <> "Vendor" Or _
+           intacctSheet.Cells(1, "M").Value <> "Employee" Or _
+           intacctSheet.Cells(1, "O").Value <> "Location name" Or _
+           intacctSheet.Cells(1, "S").Value <> "JNL" Then
+
+            MsgBox "It looks like you may have a formatting issue with the Intacct Report." & vbCrLf & _
+                   "Please check to see you have all the right columns from the import, then try again", _
+                   vbExclamation, "Formatting Issue"
+
+        Else
+
+            MsgBox "Oops... looks like you might have pulled the wrong report." & vbCrLf & _
+                   "Please get the Intacct Report and then try again.", vbExclamation, "Wrong Report"
+
+        End If
+
+        ' Select cell B1 on "Intacct Report"
+        intacctSheet.Range("B1").Select
+    End If
 End Sub
+ 
 
-Sub SF_vs_Intacct_Recon_SetUp()
+Sub Step2b_Import_Intacct_after_SF()
+    ' Check conditions before proceeding
+    If ThisWorkbook.Sheets("Salesforce Report").Range("C1").Value = "Close Date" And _
+       ThisWorkbook.Sheets("Salesforce Report").Range("D1").Value = "Account Name" And _
+       ThisWorkbook.Sheets("Salesforce Report").Range("E1").Value = "Primary Contact" And _
+       ThisWorkbook.Sheets("Salesforce Report").Range("F1").Value = "Payment Amount" And _
+       ThisWorkbook.Sheets("Salesforce Report").Range("J1").Value = "Primary Campaign Source" And _
+       ThisWorkbook.Sheets("Salesforce Report").Range("L1").Value = "Deposit Date" And _
+       ThisWorkbook.Sheets("Salesforce Report").Range("N1").Value = "Check Number" Then
+
+        ' Unprotect "Salesforce Report" sheet
+        ThisWorkbook.Sheets("Salesforce Report").Unprotect
+
+        ' Delete the button in "Salesforce Report" sheet
+        Dim sfButtonShape As Shape
+        On Error Resume Next
+        Set sfButtonShape = ThisWorkbook.Sheets("Salesforce Report").Shapes("Rectangle 1")
+        On Error GoTo 0
+        If Not sfButtonShape Is Nothing Then
+            sfButtonShape.Delete
+        End If
+
+        ' Delete column A
+        ThisWorkbook.Sheets("Salesforce Report").Columns("A").Delete
+
+        Dim intacctSheet As Worksheet
+        Dim reconStartSheet As Worksheet
+        Dim buttonShape As Shape
+        Dim buttonText As String
+
+        ' Create a new sheet for "Intacct Report"
+        Set intacctSheet = ThisWorkbook.Sheets.Add
+        intacctSheet.Name = "Intacct Report"
+        intacctSheet.Activate
+        intacctSheet.Range("A1").Select
+
+        ' Delete "SF vs Intacct Recon Start" sheet
+        Application.DisplayAlerts = False
+        On Error Resume Next
+        ThisWorkbook.Sheets("SF vs Intacct Recon Start").Delete
+        On Error GoTo 0
+        Application.DisplayAlerts = True
+
+        ' Format cell A1 on "Intacct Report"
+        With intacctSheet.Range("A1")
+            .Value = "Insert Here>>>"
+            .Font.Name = "Calibri Light"
+            .Font.Size = 11
+            .Font.Underline = xlUnderlineStyleSingle
+            .Interior.Color = RGB(255, 255, 0)
+            .Font.Bold = True
+        End With
+
+        ' Merge and format cells A2:A7
+        With intacctSheet.Range("A2:A7")
+            .Merge
+            .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
+            .Font.Name = "Calibri Light"
+            .Font.Size = 10
+            .Interior.Color = RGB(255, 255, 0)
+            .WrapText = True
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+        End With
+
+        ' Adjust column A width and button placement
+        intacctSheet.Columns("A").ColumnWidth = 15
+        intacctSheet.Activate
+        Set buttonShape = intacctSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50)
+        buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Start SF vs Intacct Recon Now"
+        With buttonShape
+            .Left = intacctSheet.Range("A10").Left
+            .Top = intacctSheet.Range("A10").Top + intacctSheet.Range("A10:A19").Height
+            .Width = intacctSheet.Range("A10:A19").Width
+            .TextFrame.Characters.Text = buttonText
+            .TextFrame.Characters.Font.Name = "Calibri Light"
+            .TextFrame.Characters.Font.Size = 11
+            .TextFrame.Characters.Font.Color = RGB(255, 255, 0)
+            .TextFrame.Characters.Font.Bold = True
+            .TextFrame.HorizontalAlignment = xlCenter
+            .TextFrame.VerticalAlignment = xlCenter
+            .OnAction = "Step3_SF_vs_Intacct_Recon_SetUp"
+        End With
+
+        ' Scale the button and move to B1
+        buttonShape.LockAspectRatio = msoFalse
+        buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
+        buttonShape.ScaleHeight 4.5, msoFalse, msoScaleFromBottomRight
+        intacctSheet.Range("B1").Select
+
+        ' Protect the "Intacct Report" sheet
+        Cells.Select
+        Selection.Locked = False
+        Selection.FormulaHidden = False
+        Columns("A:A").Select
+        Selection.Locked = True
+        Selection.FormulaHidden = False
+        intacctSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
+            False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
+            AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
+            :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
+            AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
+            AllowUsingPivotTables:=True
+
+        ' Click on cell B1
+        intacctSheet.Range("B1").Select
+
+    ElseIf ThisWorkbook.Sheets("Salesforce Report").Range("C1").Value = "Posted dt." And _
+           ThisWorkbook.Sheets("Salesforce Report").Range("D1").Value = "Doc dt." Then
+
+        ' Delete contents in columns B:Z
+        ThisWorkbook.Sheets("Salesforce Report").Range("B:Z").ClearContents
+
+        ' Show a message box
+        MsgBox "Oops... I think you may have put in the Intacct Report Data." & vbNewLine & _
+               "Please get the Salesforce Data and try again!", vbExclamation, "Data Error"
+
+        Exit Sub
+
+    Else
+        ' Delete contents in columns B:Z
+        ThisWorkbook.Sheets("Salesforce Report").Range("B:Z").ClearContents
+
+        ' Show a message box
+        MsgBox "It looks like you may have a formatting issue with the Intacct Report." & vbNewLine & _
+               "Please check to see you have all the right columns from the import, then try again.", _
+               vbExclamation, "Formatting Issue"
+
+        Exit Sub
+    End If
+End Sub
+ 
+
+Sub Step3_SF_vs_Intacct_Recon_SetUp()
     
     ' Step 1: Check if cells are populated
     If IsEmpty(Range("C1").Value) Or IsEmpty(Range("D1").Value) Or IsEmpty(Range("E1").Value) Or IsEmpty(Range("F1").Value) Or IsEmpty(Range("G1").Value) Then
@@ -773,7 +887,7 @@ Sub SF_vs_Intacct_Recon_SetUp()
     sfSheet.Range("T1").formula = "=C1"
     sfSheet.Range("U1").formula = "=D1"
     sfSheet.Range("V1").formula = "=B1"
-    sfSheet.Range("W1").formula = "=K1"
+    sfSheet.Range("W1").formula = "=IF(K1="""","""",K1)"
 
     ' Get the last row from Reference Page
     Dim lastRowSalesforce As Long
@@ -1002,17 +1116,14 @@ Sub SF_vs_Intacct_Recon_SetUp()
             pasteRow2 = pasteRow2 + 1
         End If
     Next copyRow2
-    
-End Sub
-Sub PerformTasks()
-    Dim lastRow As Long
+      
+    ' Summary Page Formatting
     Dim workSheet5 As Worksheet
     Dim workSheet6 As Worksheet
     Dim workSheet10 As Worksheet
     Dim workSheet11 As Worksheet
     Dim workSheet12 As Worksheet
     Dim workSheet13 As Worksheet
-    Dim i As Long
     
     ' Set a reference to the "Summary" worksheet
     Set workSheet5 = Worksheets("Summary")
@@ -1048,6 +1159,11 @@ Sub PerformTasks()
         workSheet5.Cells(i, "K").formula = "=IF(AND(C" & i & "="""",D" & i & "=""""),"""",IF(LEN(C" & i & ")>0,IF(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:W,5,0)<>0,TEXT(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:W,5,0),""YYYY/MM/DD""),""""),IF(LEN(D" & i & ")>0,IF(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,3,0)=0,"""",TEXT(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,3,0),""YYYY/MM/DD"")),"""")))"
     Next i
     
+    'Copy and Paste values of column E
+    workSheet5.Range("E:E").Copy
+    workSheet5.Range("E1").PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+    Application.CutCopyMode = False ' Clear clipboard
+    
     ' Format columns A, B, C, D as custom format for accounting style with parentheses and comma style
     workSheet5.Range("A:A, B:B, C:C, D:D").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
     
@@ -1060,10 +1176,6 @@ Sub PerformTasks()
     ' Format in "SF vs Intacct Variance Analysis" Worksheet columns C, D, E, L, N, M as custom format for accounting style with parentheses and comma style
     workSheet6.Range("C:C, D:D, E:E, L:L, N:N, M:M").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
     
-    ' Reorder worksheets
-    workSheet10.Move Before:=workSheet11
-    workSheet11.Move Before:=workSheet13
-    workSheet13.Move Before:=workSheet12
     
  ' Loop through each visible worksheet and activate cell A1
     Dim ws As Worksheet
@@ -1081,143 +1193,3 @@ End Sub
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Sub Import_SF_after_Intacct()
-    ' Delete the button in "Intacct Report" sheet
-    Dim intacctButtonShape As Shape
-    On Error Resume Next
-    Set intacctButtonShape = ThisWorkbook.Sheets("Intacct Report").Shapes("Rectangle 1") ' Replace with the actual button name
-    On Error GoTo 0
-    If Not intacctButtonShape Is Nothing Then
-        intacctButtonShape.Delete
-    End If
-
-    ' Unprotect "Intacct Report" sheet
-    ThisWorkbook.Sheets("Intacct Report").Unprotect
-
-    ' Delete column A
-    ThisWorkbook.Sheets("Intacct Report").Columns("A").Delete
-
-    Dim sfSheet As Worksheet
-    Dim reconStartSheet As Worksheet
-    Dim buttonShape As Shape
-    Dim buttonText As String
-
-    ' Create a new sheet for "Salesforce Report"
-    Set sfSheet = ThisWorkbook.Sheets.Add
-    sfSheet.Name = "Salesforce Report"
-    sfSheet.Activate
-    sfSheet.Range("A1").Select
-
-    ' Delete "SF vs Intacct Recon Start" sheet
-    Application.DisplayAlerts = False ' Prevent deletion confirmation
-    On Error Resume Next ' Ignore error if sheet doesn't exist
-    ThisWorkbook.Sheets("SF vs Intacct Recon Start").Delete
-    On Error GoTo 0 ' Reset error handling
-    Application.DisplayAlerts = True
-
-    ' Format cell A1 on "Salesforce Report"
-    With sfSheet.Range("A1")
-        .Value = "Insert Here>>>"
-        .Font.Name = "Calibri Light"
-        .Font.Size = 11
-        .Font.Underline = xlUnderlineStyleSingle
-        .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
-        .Font.Bold = True
-    End With
-
-    ' Merge and format cells A2:A7
-    With sfSheet.Range("A2:A7")
-        .Merge
-        .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
-        .Font.Name = "Calibri Light"
-        .Font.Size = 10
-        .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
-        .WrapText = True
-        .HorizontalAlignment = xlCenter
-        .VerticalAlignment = xlCenter
-    End With
-
-    ' Adjust column A width and button placement
-    sfSheet.Columns("A").ColumnWidth = 15 ' Adjusted to 15
-    sfSheet.Activate
-    Set buttonShape = sfSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50) ' Adjust size as needed
-    buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Start SF vs Intacct Recon Now"
-    With buttonShape
-        .Left = sfSheet.Range("A10").Left ' Adjusted to A10
-        .Top = sfSheet.Range("A10").Top + sfSheet.Range("A10:A19").Height ' Adjusted to A20
-        .Width = sfSheet.Range("A10:A19").Width ' Adjusted range
-        .TextFrame.Characters.Text = buttonText
-        .TextFrame.Characters.Font.Name = "Calibri Light"
-        .TextFrame.Characters.Font.Size = 11
-        .TextFrame.Characters.Font.Color = RGB(255, 255, 0) ' Yellow color
-        .TextFrame.Characters.Font.Bold = True
-        .TextFrame.HorizontalAlignment = xlCenter
-        .TextFrame.VerticalAlignment = xlCenter
-        .OnAction = "SF_vs_Intacct_Recon_SetUp"
-    End With
-
-    ' Scale the button and move to B1
-    buttonShape.LockAspectRatio = msoFalse
-    buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
-    buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
-    sfSheet.Range("B1").Select
-
-    ' Protect the "Salesforce Report" sheet
-    Cells.Select
-    Selection.Locked = False
-    Selection.FormulaHidden = False
-    Columns("A:A").Select
-    Selection.Locked = True
-    Selection.FormulaHidden = False
-    sfSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
-        False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
-        AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
-        :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
-        AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
-        AllowUsingPivotTables:=True
-
-    ' Click on cell B1
-    sfSheet.Range("B1").Select
-End Sub
-
-To start this make I first want to check if C1 = "Posted dt."
-then if D1 = "Doc dt."
-if either of those conditions are wrong, 
-Check if C1 = "Close Date"
-Then if D1 = "Account Name"
-if this is the case, delete all contents in columns B:Z
-and have a pop up saying 
-"Oops... I think you may have put in the Salesforce Report Data. 
-Please get the Intacct Data and try again!"
-using this two line formatting
-if only the first condition is wrong, then delete all contents in columns B:Z
-and have a pop up saying 
