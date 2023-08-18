@@ -1052,3 +1052,78 @@ Sub SF_vs_Intacct_Recon_SetUp()
     End With
 
 End Sub
+
+
+
+
+
+
+
+
+
+
+
+Sub PerformTasks()
+    Dim lastRow As Long
+    Dim workSheet5 As Worksheet
+    Dim i As Long
+    
+    ' Set a reference to the "Summary" worksheet
+    Set workSheet5 = Worksheets("Summary")
+    
+    ' Hide "Reference Page" worksheet
+    Worksheets("Reference Page").Visible = xlSheetHidden
+    
+    ' Find the last row of data in column F
+    lastRow = workSheet5.Cells(workSheet5.Rows.Count, "F").End(xlUp).Row
+    
+    ' Fill down formulas in columns B, E, G, H, I, J, K
+    workSheet5.Range("B4:B" & lastRow).formula = "=IF(AND(C4="""",D4=""""),"""",IF(LEN(C4)>0,ABS(C4),ABS(D4)))"
+    workSheet5.Range("E4:E" & lastRow).formula = "=IF(LEFT(F4,1)=""P"",LEFT(F4,FIND(""_"",F4)-1),""No PMT-ID"")"
+    workSheet5.Range("G4:G" & lastRow).formula = "=IF(LEN(D4)>0,IF(ISNUMBER(FIND("","",RIGHT(F4,LEN(F4)-FIND(""*"",F4)))),TRIM(RIGHT(RIGHT(F4,LEN(F4)-FIND(""*"",F4)),LEN(RIGHT(F4,LEN(F4)-FIND(""*"",F4)))-FIND("","",RIGHT(F4,LEN(F4)-FIND(""*"",F4))))) & "" "" & LEFT(RIGHT(F4,LEN(F4)-FIND(""*"",F4)),FIND("","",RIGHT(F4,LEN(F4)-FIND(""*"",F4)))-1),IF(ISNUMBER(FIND(""*"",F4)),RIGHT(F4,LEN(F4)-FIND(""*"",F4)),""No Name in Intacct"")),VLOOKUP(LEFT(F4,FIND(""_"",F4)-1),'Salesforce Report'!S:U,3,0))"
+    
+    
+    For i = 4 To lastRow
+        ' Fill column H with sequential numbers starting from 1
+        workSheet5.Cells(i, "H").Value = i - 3
+        
+        ' Formula for column I
+        workSheet5.Cells(i, "I").formula = "=IF(G" & i & "=G" & (i - 1) & ",""Same Name"","""")"
+        
+        ' Formula for column J
+        workSheet5.Cells(i, "J").formula = "=IF(AND(C" & i & "="""",D" & i & "=""""),"""",IF(LEN(C" & i & ")>0,TEXT(IFERROR(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:V,4,0),""""),""YYYY/MM/DD""),TEXT(IFERROR(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,2,0),""""),""YYYY/MM/DD"")))"
+        
+        ' Formula for column K
+        workSheet5.Cells(i, "K").formula = "=IF(AND(C" & i & "="""",D" & i & "=""""),"""",IF(LEN(C" & i & ")>0,IF(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:W,5,0)<>0,TEXT(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:W,5,0),""YYYY/MM/DD""),""""),IF(LEN(D" & i & ")>0,IF(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,3,0)=0,"""",TEXT(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,3,0),""YYYY/MM/DD"")),"""")))"
+    Next i
+    
+    ' Format columns A, B, C, D as custom format for accounting style with parentheses and comma style
+    workSheet5.Range("A:A, B:B, C:C, D:D").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+    
+    ' Apply autofilter to A3:K3
+    workSheet5.Range("A3:K3").AutoFilter
+    
+    ' Set a reference to the "SF vs Intacct Variance Analysis" worksheet
+    Set workSheet6 = Worksheets("SF vs Intacct Variance Analysis")
+    
+     ' Format in "SF vs Intacct Variance Analysis" Worksheet columns C, D, E, L, N, M as custom format for accounting style with parentheses and comma style
+    workSheet6.Range("C:C, D:D, E:E, L:L, N:N, M:M").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+
+    ' Set a reference to the "SF vs Intacct Variance Analysis" worksheet
+    Set workSheet6 = Worksheets("SF vs Intacct Variance Analysis")
+    
+    ' Format in "SF vs Intacct Variance Analysis" Worksheet columns C, D, E, L, N, M as custom format for accounting style with parentheses and comma style
+    workSheet6.Range("C:C, D:D, E:E, L:L, N:N, M:M").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+    
+    ' Reorder worksheets
+    Worksheets("Summary").Move Before:=Worksheets("SF vs Intacct Variance Analysis")
+    Worksheets("SF vs Intacct Variance Analysis").Move Before:=Worksheets("Salesforce Report")
+    Worksheets("Salesforce Report").Move Before:=Worksheets("Intacct Report")
+    
+ 
+    ' Go back to the "Summary" worksheet
+    Worksheets("Summary").Activate
+    Worksheets("Summary").Cells(1, 1).Select
+    
+End Sub
+
