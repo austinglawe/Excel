@@ -1,0 +1,1081 @@
+
+Sub COMPLETE_RESET()
+    Dim userResponse As VbMsgBoxResult
+    Dim ws As Worksheet
+    Dim quotation As String
+
+ 
+
+    ' Prompt the user for confirmation with custom styling
+    userResponse = MsgBox("Are you sure you want to reset the workbook? This will erase all data and reset it back to the starting point.", _
+                          vbYesNo + vbExclamation + vbDefaultButton2, "Confirm Reset")
+
+ 
+
+    ' Check user's response
+    If userResponse = vbYes Then
+        ' Add a new worksheet called "reset"
+        ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)).Name = "reset"
+
+ 
+
+        ' Delete all existing worksheets except for "reset"
+        Application.DisplayAlerts = False
+        For Each ws In ThisWorkbook.Worksheets
+            If ws.Name <> "reset" Then
+                ws.Delete
+            End If
+        Next ws
+        Application.DisplayAlerts = True
+
+ 
+
+        ' Rename "reset" tab to "Summary"
+        ThisWorkbook.Sheets("reset").Name = "Summary"
+
+ 
+
+        ' Add new worksheets
+        ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)).Name = "SF vs Intacct Variance Analysis"
+        ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)).Name = "Reference Page"
+
+ 
+
+        ' Set the target worksheet for formatting and formulas
+        Set ws = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis")
+
+ 
+
+        ' Format A2:F2
+        ws.Range("A2:F2").Merge
+        ws.Range("A2:F2").HorizontalAlignment = xlCenter
+        ws.Range("A2:F2").Interior.Color = RGB(192, 192, 192) ' Grey color
+        ws.Range("A2:F2").Font.Color = RGB(0, 0, 0) ' Black color
+        ws.Range("A2:F2").Value = "(Columns in order - Payment ID, Memo/Description; Rows in order - [Sum of] Balance)"
+
+
+ 
+
+        ' Format I2:N2
+        ws.Range("I2:N2").Merge
+        ws.Range("I2:N2").HorizontalAlignment = xlCenter
+        ws.Range("I2:N2").Interior.Color = RGB(192, 192, 192) ' Grey color
+        ws.Range("I2:N2").Font.Color = RGB(0, 0, 0) ' Black color
+        ws.Range("I2:N2").Value = "(Columns in order - Payment: Payment Number, Opportunity Name; Row - [Sum of] Payment Amount)"
+
+ 
+
+ 
+
+        ' Format B1
+        ws.Range("B1").Interior.Color = RGB(79, 129, 189) ' Bright blue
+        quotation = """"
+        ws.Range("B1").formula = "!=ADDRESS(MAX(IF(A:A<>" & quotation & quotation & ", ROW(A:A)-1)), COLUMN(A:A), 4)"
+
+ 
+
+ 
+
+        ' Format J1
+        ws.Range("J1").Interior.Color = RGB(79, 129, 189) ' Bright blue
+        ws.Range("J1").formula = "!=ADDRESS(MAX(IF(I:I<>" & quotation & quotation & ", ROW(I:I)-1)), COLUMN(I:I), 4)"
+
+ 
+
+ 
+
+        ' Format K1
+        ws.Range("K1").Interior.Color = RGB(146, 208, 80) ' Dull green
+        ws.Range("K1").formula = "=""K""&RIGHT(J1,LEN(J1)-1)"
+
+ 
+
+ 
+
+        ' Format C1
+        ws.Range("C1").Interior.Color = RGB(146, 208, 80) ' Dull green
+        ws.Range("C1").formula = "=""C""&RIGHT(B1,LEN(B1)-1)"
+
+ 
+
+ 
+
+        ' Format A3:C3
+        ws.Range("A3:C3").Merge
+        ws.Range("A3:C3").HorizontalAlignment = xlCenter
+        ws.Range("A3:C3").Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+        ws.Range("A3:C3").Value = "\/ Insert Intacct Pivot Table below (in A4)"
+
+ 
+
+ 
+
+        ' Format I3:K3
+        ws.Range("I3:K3").Merge
+        ws.Range("I3:K3").HorizontalAlignment = xlCenter
+        ws.Range("I3:K3").Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+        ws.Range("I3:K3").Value = "\/ Insert Salesforce Pivot Table below (in I4)"
+
+ 
+
+ 
+
+        ' Format D3, E3, F3, L3, M3, N3
+        ws.Range("D3").Value = "Salesforce Comparison"
+        ws.Range("E3").Value = "Variance"
+        ws.Range("F3").Value = "PaymentID_Memo/Description"
+        ws.Range("G3").Value = "Use in Summary Page"
+        ws.Range("L3").Value = "Intacct Comparison"
+        ws.Range("M3").Value = "Variance"
+        ws.Range("N3").Value = "PaymentID_OpportunityName"
+        ws.Range("O3").Value = "Use in Summary Page"
+ 
+
+ 
+
+        ' Set formulas in D5:N5
+        ws.Range("D5").formula = "=IFERROR(VLOOKUP(A5,$I$4:INDIRECT($K$1),3,0),0)"
+        ws.Range("E5").formula = "=C5+D5"
+        ws.Range("F5").formula = "=A5&" & Chr(34) & "_" & Chr(34) & "&B5"
+        ws.Range("L5").formula = "=IFERROR(VLOOKUP(I5,$A$4:INDIRECT($C$1),3,0),0)"
+        ws.Range("M5").formula = "=K5+L5"
+        ws.Range("N5").formula = "=I5&" & Chr(34) & "_" & Chr(34) & "&J5"
+
+ 
+
+ 
+
+        ' Apply filters to A3:N3
+        ws.Range("A3:O3").AutoFilter
+
+ 
+
+ 
+
+        ' Set column width to 15.00 (110 pixels)
+        ws.Columns("A:N").ColumnWidth = 15#
+
+ 
+
+ 
+
+        ' Activate the "SF vs Intacct Variance Analysis" sheet and go to cell A1
+        ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Activate
+        ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("A1").Select
+
+ 
+
+ 
+
+        ' Turn on screen updating to see the changes
+        Application.ScreenUpdating = True
+
+ 
+
+ 
+
+        ' Remove ! From the formulas in B1 and J1
+
+ 
+
+         Range("B1").Select
+         ActiveCell.Formula2R1C1 = _
+         "=ADDRESS(MAX(IF(C[-1]<>"""", ROW(C[-1])-1)), COLUMN(C[-1]), 4)"
+         Range("J1").Select
+         ActiveCell.Formula2R1C1 = _
+         "=ADDRESS(MAX(IF(C[-1]<>"""", ROW(C[-1])-1)), COLUMN(C[-1]), 4)"
+         Range("A1").Select
+
+         ' Populate Summary Worksheet
+         Dim summarySheet As Worksheet
+         Set summarySheet = ThisWorkbook.Sheets("Summary")
+
+         ' Go to the Summary worksheet
+         summarySheet.Activate
+
+         ' Type the headings in the specified cells
+        summarySheet.Range("A2").Value = "Total"
+        summarySheet.Range("B2").Value = "Absolute Value"
+        summarySheet.Range("C2").Value = "Intacct"
+        summarySheet.Range("C1").Value = "from Salesforce Report"
+        summarySheet.Range("D1").Value = "from Intacct Report"
+        summarySheet.Range("D2").Value = "Salesforce"
+        summarySheet.Range("E2").Value = "Payment Number"
+        summarySheet.Range("F2").Value = "Name"
+        summarySheet.Range("G2").Value = "Family Name"
+        summarySheet.Range("H2").Value = "Number"
+        summarySheet.Range("I2").Value = "Same Name as Above"
+        summarySheet.Range("J1").Value = "(SF) - Close Date, (Intacct) - Posted dt."
+        summarySheet.Range("K1").Value = "(SF) - Deposit Date, (Intacct) - Doc. Dt."
+        summarySheet.Range("J2").Value = "Date 1"
+        summarySheet.Range("K2").Value = "Date 2"
+        summarySheet.Range("J3").Value = "Year/Month/Day"
+        summarySheet.Range("K3").Value = "Year/Month/Day"
+
+        ' Change the column width to 15.86 (116 pixels)
+        summarySheet.Columns("A:K").ColumnWidth = 15.86
+
+        ' Change the column width for specific columns (C,D,I) to 21.00 (152 pixels)
+        summarySheet.Columns("C:C").ColumnWidth = 21#
+        summarySheet.Columns("D:D").ColumnWidth = 21#
+        summarySheet.Columns("I:I").ColumnWidth = 21#
+
+        ' Insert the formulas in cells A3, C3, and D3
+        summarySheet.Range("C3").formula = "=IFERROR(GETPIVOTDATA(""Balance"",'SF vs Intacct Variance Analysis'!$A$4)*-1,)"
+        summarySheet.Range("D3").formula = "=IFERROR(GETPIVOTDATA(""Payment Amount"",'SF vs Intacct Variance Analysis'!$I$4),)"
+        summarySheet.Range("A3").formula = "=D3-C3"
+
+        ' Check the value in cell C3 and apply highlighting if it's 0
+        If summarySheet.Range("C3").Value = 0 Then
+            summarySheet.Range("C3").Interior.Color = RGB(255, 0, 0) ' Red color
+        Else
+            summarySheet.Range("C3").Interior.ColorIndex = xlNone ' Remove any previous highlighting
+        End If
+
+        ' Check the value in cell D3 and apply highlighting if it's 0
+        If summarySheet.Range("D3").Value = 0 Then
+            summarySheet.Range("D3").Interior.Color = RGB(255, 0, 0) ' Red color
+        Else
+            summarySheet.Range("D3").Interior.ColorIndex = xlNone ' Remove any previous highlighting
+        End If
+
+        ' Create Recon Worksheet And Hide Others
+        Dim newWorksheet As Worksheet
+
+        ' Add a new worksheet called "SF vs Intacct Recon Start"
+        Set newWorksheet = ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count))
+        newWorksheet.Name = "SF vs Intacct Recon Start"
+
+        ' Hide all other worksheets
+        For Each ws In ThisWorkbook.Worksheets
+            If ws.Name <> "SF vs Intacct Recon Start" Then
+                ws.Visible = xlSheetHidden
+            End If
+        Next ws
+
+ 
+
+        ' Insert Button
+        Dim buttonShape As Shape
+        Dim buttonText As String
+
+        ' Reference the "SF vs Intacct Recon Start" worksheet
+        Set ws = ThisWorkbook.Sheets("SF vs Intacct Recon Start")
+
+        ' Highlight the entire worksheet with dark grey fill
+        ws.Cells.Interior.Color = RGB(64, 64, 64) ' Dark grey color
+
+        ' Add a button (shape) to the worksheet
+        Set buttonShape = ws.Shapes.AddShape(msoShapeRectangle, 0, 0, 900, 500)
+        buttonText = "Click Here to Start" & vbCrLf & "Intacct vs. Salesforce" & vbCrLf & "Reconciliation"
+        With buttonShape
+            .OnAction = "Insert_SF_or_Intacct_Report"
+            .TextFrame.Characters.Text = buttonText
+            .TextFrame.Characters.Font.Name = "Sagona ExtraLight"
+            .TextFrame.Characters.Font.FontStyle = "Bold"
+            .TextFrame.Characters.Font.Size = 55
+            .TextFrame.Characters.Font.Color = RGB(0, 0, 0) ' Black color
+            .TextFrame.HorizontalAlignment = xlCenter
+            .TextFrame.VerticalAlignment = xlCenter
+        End With
+
+        ' Fill cells U1 through AC1 with yellow fill
+        ws.Range("U1:AC1").Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+        ws.Range("U2:AC2").Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+
+        ' Insert the disclaimer in cell U1 and set red text color
+        ws.Range("U1").Value = "***Disclaimer DO NOT CHANGE any sheet names or save it.***"
+        ws.Range("U1").Font.Color = RGB(255, 0, 0) ' Red color
+        ws.Range("U2").Value = "The macro will change sheet names, and prompt you when it is time to save the file."
+        ws.Range("U2").Font.Color = RGB(255, 0, 0) ' Red color
+
+        ' Activate cell T1
+        ws.Range("T1").Activate
+
+ 
+
+ 
+
+    End If
+End Sub
+
+ 
+
+Sub Insert_SF_or_Intacct_Report()
+    Dim userResponse As VbMsgBoxResult
+    Dim intacctSheet As Worksheet
+    Dim sfSheet As Worksheet
+    Dim reconStartSheet As Worksheet
+    Dim ws As Worksheet
+    Dim buttonShape As Shape
+    Dim buttonText As String
+
+    ' Check if the Intacct Report is available
+    userResponse = MsgBox("Do you have the Intacct Report?", vbYesNo, "Intacct Report")
+
+    If userResponse = vbYes Then
+        MsgBox "Please Copy and Paste the Intacct Report after this prompt.", vbInformation, "Intacct Report"
+        ' Create a new worksheet for Intacct Report
+        Set intacctSheet = ThisWorkbook.Sheets.Add
+        intacctSheet.Name = "Intacct Report"
+        intacctSheet.Activate
+        intacctSheet.Range("A1").Select
+        Set reconStartSheet = ThisWorkbook.Sheets("SF vs Intacct Recon Start")
+        Application.DisplayAlerts = False ' Prevent deletion confirmation
+        reconStartSheet.Delete
+        Application.DisplayAlerts = True
+
+        ' Format cell A1
+        With intacctSheet.Range("A1")
+            .Value = "Insert Here>>>"
+            .Font.Name = "Calibri Light"
+            .Font.Size = 11
+            .Font.Underline = xlUnderlineStyleSingle
+            .Font.Bold = True
+            .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+        End With
+
+        ' Merge and format cells A2:A7
+        With intacctSheet.Range("A2:A7")
+            .Merge
+            .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
+            .Font.Name = "Calibri Light"
+            .Font.Size = 10
+            .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+            .WrapText = True
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+        End With
+
+        ' Adjust column A width
+        intacctSheet.Columns("A").ColumnWidth = 15 ' Adjusted to 15
+
+        ' Add button for importing Salesforce Report
+        Set buttonShape = intacctSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50) ' Adjust size as needed
+        buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Import Salesforce Report Now"
+        With buttonShape
+            .Left = intacctSheet.Range("A10").Left ' Adjusted to A10
+            .Top = intacctSheet.Range("A10").Top + intacctSheet.Range("A10:A19").Height ' Adjusted to A20
+            .Width = intacctSheet.Range("A10:A19").Width ' Adjusted range
+            .TextFrame.Characters.Text = buttonText
+            .TextFrame.Characters.Font.Name = "Calibri Light"
+            .TextFrame.Characters.Font.Size = 11
+            .TextFrame.Characters.Font.Color = RGB(255, 255, 0) ' Yellow color
+            .TextFrame.Characters.Font.Bold = True
+            .TextFrame.HorizontalAlignment = xlCenter
+            .TextFrame.VerticalAlignment = xlCenter
+            .OnAction = "Import_SF_after_Intacct" ' Update macro name
+        End With
+
+        ' Scale the button and move to B1
+        buttonShape.LockAspectRatio = msoFalse
+        buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
+        buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
+        intacctSheet.Range("B1").Select
+
+        ' Protect the Intacct Report sheet
+        Cells.Select
+        Selection.Locked = False
+        Selection.FormulaHidden = False
+        Columns("A:A").Select
+        Selection.Locked = True
+        Selection.FormulaHidden = False
+        intacctSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
+            False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
+            AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
+            :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
+            AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
+            AllowUsingPivotTables:=True
+
+        ' Click on cell B1
+        intacctSheet.Range("B1").Select
+
+ 
+
+    ElseIf userResponse = vbNo Then
+        ' Check if the Salesforce Report is available
+        userResponse = MsgBox("Do you have the Salesforce Report?", vbYesNo, "Salesforce Report")
+        If userResponse = vbYes Then
+            MsgBox "Please Copy and Paste the Salesforce Report after this prompt.", vbInformation, "Salesforce Report"
+            ' Create a new worksheet for Salesforce Report
+            Set sfSheet = ThisWorkbook.Sheets.Add
+            sfSheet.Name = "Salesforce Report"
+            sfSheet.Activate
+            sfSheet.Range("A1").Select
+            Set reconStartSheet = ThisWorkbook.Sheets("SF vs Intacct Recon Start")
+            Application.DisplayAlerts = False ' Prevent deletion confirmation
+            reconStartSheet.Delete
+            Application.DisplayAlerts = True
+
+            ' Format cell A1
+            With sfSheet.Range("A1")
+                .Value = "Insert Here>>>"
+                .Font.Name = "Calibri Light"
+                .Font.Size = 11
+                .Font.Underline = xlUnderlineStyleSingle
+                .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+                .Font.Bold = True
+            End With
+
+            ' Merge and format cells A2:A7
+            With sfSheet.Range("A2:A7")
+                .Merge
+                .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
+                .Font.Name = "Calibri Light"
+                .Font.Size = 10
+                .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+                .WrapText = True
+                .HorizontalAlignment = xlCenter
+                .VerticalAlignment = xlCenter
+            End With
+
+            ' Adjust column A width and button placement
+            sfSheet.Columns("A").ColumnWidth = 15 ' Adjusted to 15
+            sfSheet.Activate
+            Set buttonShape = sfSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50) ' Adjust size as needed
+            buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Import Intacct Report Now"
+            With buttonShape
+                .Left = sfSheet.Range("A10").Left ' Adjusted to A10
+                .Top = sfSheet.Range("A10").Top + sfSheet.Range("A10:A19").Height ' Adjusted to A20
+                .Width = sfSheet.Range("A10:A19").Width ' Adjusted range
+                .TextFrame.Characters.Text = buttonText
+                .TextFrame.Characters.Font.Name = "Calibri Light"
+                .TextFrame.Characters.Font.Size = 11
+                .TextFrame.Characters.Font.Color = RGB(255, 255, 0) ' Yellow color
+                .TextFrame.Characters.Font.Bold = True
+                .TextFrame.HorizontalAlignment = xlCenter
+                .TextFrame.VerticalAlignment = xlCenter
+                .OnAction = "Import_Intacct_after_SF"
+            End With
+
+            ' Scale the button and move to B1
+            buttonShape.LockAspectRatio = msoFalse
+            buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
+            buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
+            sfSheet.Range("B1").Select
+
+            ' Protect the Salesforce Report sheet
+            Cells.Select
+            Selection.Locked = False
+            Selection.FormulaHidden = False
+            Columns("A:A").Select
+            Selection.Locked = True
+            Selection.FormulaHidden = False
+            sfSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
+                False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
+                AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
+                :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
+                AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
+                AllowUsingPivotTables:=True
+
+            ' Click on cell B1
+            sfSheet.Range("B1").Select
+
+ 
+
+        ElseIf userResponse = vbNo Then
+            MsgBox "Please Download those reports and have them ready! Then press this button to get started.", vbInformation, "Reports Not Available"
+            Exit Sub ' End the macro
+        End If
+    End If
+End Sub
+
+ 
+
+ 
+
+Sub Import_SF_after_Intacct()
+    ' Delete the button in "Intacct Report" sheet
+    Dim intacctButtonShape As Shape
+    On Error Resume Next
+    Set intacctButtonShape = ThisWorkbook.Sheets("Intacct Report").Shapes("Rectangle 1") ' Replace with the actual button name
+    On Error GoTo 0
+    If Not intacctButtonShape Is Nothing Then
+        intacctButtonShape.Delete
+    End If
+
+    ' Unprotect "Intacct Report" sheet
+    ThisWorkbook.Sheets("Intacct Report").Unprotect
+
+    ' Delete column A
+    ThisWorkbook.Sheets("Intacct Report").Columns("A").Delete
+
+    Dim sfSheet As Worksheet
+    Dim reconStartSheet As Worksheet
+    Dim buttonShape As Shape
+    Dim buttonText As String
+
+    ' Create a new sheet for "Salesforce Report"
+    Set sfSheet = ThisWorkbook.Sheets.Add
+    sfSheet.Name = "Salesforce Report"
+    sfSheet.Activate
+    sfSheet.Range("A1").Select
+
+    ' Delete "SF vs Intacct Recon Start" sheet
+    Application.DisplayAlerts = False ' Prevent deletion confirmation
+    On Error Resume Next ' Ignore error if sheet doesn't exist
+    ThisWorkbook.Sheets("SF vs Intacct Recon Start").Delete
+    On Error GoTo 0 ' Reset error handling
+    Application.DisplayAlerts = True
+
+    ' Format cell A1 on "Salesforce Report"
+    With sfSheet.Range("A1")
+        .Value = "Insert Here>>>"
+        .Font.Name = "Calibri Light"
+        .Font.Size = 11
+        .Font.Underline = xlUnderlineStyleSingle
+        .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+        .Font.Bold = True
+    End With
+
+    ' Merge and format cells A2:A7
+    With sfSheet.Range("A2:A7")
+        .Merge
+        .Value = "(If it is not working, try copying it over by copying the columns, rather than the entire worksheet.)"
+        .Font.Name = "Calibri Light"
+        .Font.Size = 10
+        .Interior.Color = RGB(255, 255, 0) ' Bright yellow color
+        .WrapText = True
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+    End With
+
+    ' Adjust column A width and button placement
+    sfSheet.Columns("A").ColumnWidth = 15 ' Adjusted to 15
+    sfSheet.Activate
+    Set buttonShape = sfSheet.Shapes.AddShape(msoShapeRectangle, 0, 0, 100, 50) ' Adjust size as needed
+    buttonText = "CLICK HERE" & vbNewLine & "TO" & vbNewLine & "Start SF vs Intacct Recon Now"
+    With buttonShape
+        .Left = sfSheet.Range("A10").Left ' Adjusted to A10
+        .Top = sfSheet.Range("A10").Top + sfSheet.Range("A10:A19").Height ' Adjusted to A20
+        .Width = sfSheet.Range("A10:A19").Width ' Adjusted range
+        .TextFrame.Characters.Text = buttonText
+        .TextFrame.Characters.Font.Name = "Calibri Light"
+        .TextFrame.Characters.Font.Size = 11
+        .TextFrame.Characters.Font.Color = RGB(255, 255, 0) ' Yellow color
+        .TextFrame.Characters.Font.Bold = True
+        .TextFrame.HorizontalAlignment = xlCenter
+        .TextFrame.VerticalAlignment = xlCenter
+        .OnAction = "SF_vs_Intacct_Recon_SetUp"
+    End With
+
+    ' Scale the button and move to B1
+    buttonShape.LockAspectRatio = msoFalse
+    buttonShape.ScaleWidth 1.0090909091, msoFalse, msoScaleFromTopLeft
+    buttonShape.ScaleHeight 4.6, msoFalse, msoScaleFromBottomRight
+    sfSheet.Range("B1").Select
+
+    ' Protect the "Salesforce Report" sheet
+    Cells.Select
+    Selection.Locked = False
+    Selection.FormulaHidden = False
+    Columns("A:A").Select
+    Selection.Locked = True
+    Selection.FormulaHidden = False
+    sfSheet.Protect DrawingObjects:=False, Contents:=True, Scenarios:= _
+        False, AllowFormattingCells:=True, AllowFormattingColumns:=True, _
+        AllowFormattingRows:=True, AllowInsertingColumns:=True, AllowInsertingRows _
+        :=True, AllowInsertingHyperlinks:=True, AllowDeletingColumns:=True, _
+        AllowDeletingRows:=True, AllowSorting:=True, AllowFiltering:=True, _
+        AllowUsingPivotTables:=True
+
+    ' Click on cell B1
+    sfSheet.Range("B1").Select
+End Sub
+
+Sub SF_vs_Intacct_Recon_SetUp()
+    
+    ' Step 1: Check if cells are populated
+    If IsEmpty(Range("C1").Value) Or IsEmpty(Range("D1").Value) Or IsEmpty(Range("E1").Value) Or IsEmpty(Range("F1").Value) Or IsEmpty(Range("G1").Value) Then
+        MsgBox "Oops... Please make sure you have put in the data for the Intacct Report AND the Salesforce Report. Then click this button again."
+        Exit Sub
+    End If
+
+    ' Step 2: Unprotect and perform actions
+    If ActiveSheet.Name = "Salesforce Report" Then
+        ' Unprotect "Salesforce Report" sheet
+        ThisWorkbook.Sheets("Salesforce Report").Unprotect
+
+        ' Delete the button in "Salesforce Report" sheet
+        Dim sfButtonShape As Shape
+        On Error Resume Next
+        Set sfButtonShape = ThisWorkbook.Sheets("Salesforce Report").Shapes("Rectangle 1") ' Replace with the actual button name
+        On Error GoTo 0
+        If Not sfButtonShape Is Nothing Then
+            sfButtonShape.Delete
+        End If
+
+        ' Delete column A
+        ThisWorkbook.Sheets("Salesforce Report").Columns("A").Delete
+    ElseIf ActiveSheet.Name = "Intacct Report" Then
+        ' Delete the button in "Intacct Report" sheet
+        Dim intacctButtonShape As Shape
+        On Error Resume Next
+        Set intacctButtonShape = ThisWorkbook.Sheets("Intacct Report").Shapes("Rectangle 1") ' Replace with the actual button name
+        On Error GoTo 0
+        If Not intacctButtonShape Is Nothing Then
+            intacctButtonShape.Delete
+        End If
+
+        ' Unprotect "Intacct Report" sheet
+        ThisWorkbook.Sheets("Intacct Report").Unprotect
+
+        ' Delete column A
+        ThisWorkbook.Sheets("Intacct Report").Columns("A").Delete
+    End If
+
+    ' Step 3: Unhide sheets
+    Worksheets("Summary").Visible = True
+    Worksheets("SF vs Intacct Variance Analysis").Visible = True
+    Worksheets("Reference Page").Visible = True
+
+    ' Populate Reference Page
+    Dim refPageSheet As Worksheet
+    Set refPageSheet = ThisWorkbook.Sheets("Reference Page")
+
+    ' Go to the Reference Page worksheet
+    refPageSheet.Activate
+
+    ' Populate the text and formulas in the specified cells
+    refPageSheet.Range("B1").Value = "Last cell for range in Intacct Pivot Table"
+    refPageSheet.Range("B2").Value = "Link to the Last Cell in B column in the 'Intacct Report' Tab"
+    refPageSheet.Range("B3").Value = "Last cell in B column in the 'Intacct Report' Tab"
+    refPageSheet.Range("B4").Value = "End cell Reference Number - Intacct Report"
+    refPageSheet.Range("B6").Value = "Last cell for range in Salesforce Pivot Table"
+    refPageSheet.Range("B7").Value = "Link to the Last Cell in B column in the 'Salesforce Report' Tab"
+    refPageSheet.Range("B8").Value = "Last cell in B column in the 'Salesforce Report' Tab"
+    refPageSheet.Range("B9").Value = "End Cell Reference Number - Salesforce Report"
+
+    refPageSheet.Range("A1").formula = "=""X""&RIGHT(A3,LEN(A3)-1)"
+    refPageSheet.Range("A2").formula = "=HYPERLINK(""#'Intacct Report'!""&INDIRECT(""'Reference Page'!A3""),""End of Intacct Report Data - ""&'Reference Page'!A3)"
+    refPageSheet.Range("A3").formula = "=ADDRESS(MAX(INDEX(('Intacct Report'!B:B<>"""")*(ROW('Intacct Report'!B:B)), , )), COLUMN('Intacct Report'!B:B), 4)"
+    refPageSheet.Range("A4").formula = "=RIGHT(A3,LEN(A3)-1)"
+    refPageSheet.Range("A6").formula = "=""P""&RIGHT(A8,LEN(A8)-1)"
+    refPageSheet.Range("A7").formula = "=HYPERLINK(""#'Salesforce Report'!""&INDIRECT(""'Reference Page'!A8""),""End of Salesforce Report Data - ""&'Reference Page'!A8)"
+    refPageSheet.Range("A8").formula = "=ADDRESS(MAX(INDEX(('Salesforce Report'!B:B<>"""")*(ROW('Salesforce Report'!B:B)), , )), COLUMN('Salesforce Report'!B:B), 4)"
+  refPageSheet.Range("A9").formula = "=RIGHT(A8,LEN(A8)-1)"
+
+    ' Set other variables and perform further actions
+    Dim intacctSheet As Worksheet
+    Dim referenceSheet As Worksheet
+    Dim lastRowValue As Long
+    Dim fillDownRangeF As Range
+    Dim fillDownRangeG As Range
+    Dim fillDownRangeW As Range
+    Dim fillDownRangeY As Range
+
+    ' Set the target worksheets
+    Set intacctSheet = ThisWorkbook.Sheets("Intacct Report")
+    Set referenceSheet = ThisWorkbook.Sheets("Reference Page")
+
+    ' Insert columns and set headers
+    intacctSheet.Columns("F:G").Insert Shift:=xlToRight
+    intacctSheet.Columns("W:W").Insert Shift:=xlToRight
+    intacctSheet.Columns("Y:Y").Insert Shift:=xlToRight
+
+    intacctSheet.Cells(1, 1).Value = "Account"
+    intacctSheet.Cells(1, 6).Value = "Payment ID"
+    intacctSheet.Cells(1, 7).Value = "Duplicates"
+    intacctSheet.Cells(1, 23).Value = "Balance"
+    intacctSheet.Cells(1, 24).Value = "C. Balance"
+    intacctSheet.Cells(1, 25).Value = "keep or delete"
+
+    intacctSheet.Cells(2, 6).formula = "=IFERROR(TRIM(MID(E2, FIND(""PMT"", E2), FIND("" "", E2, FIND(""PMT"", E2)) - FIND(""PMT"", E2))),""No PMT-ID"")"
+    intacctSheet.Cells(2, 7).formula = "=IF(F2=""No PMT-ID"", IF(E2="""",""Duplicate"", IF(E3=E2, ""Duplicate"", """" )), IF(F2="""",""Duplicate"", IF(F3=F2, ""Duplicate"", """")))"
+    intacctSheet.Cells(2, 23).formula = "=U2-V2"
+    intacctSheet.Cells(2, 25).formula = "=IF(C2="""",""Delete"",""Keep"")"
+
+    ' Get the last row value from Reference Page
+    lastRowValue = referenceSheet.Range("A4").Value
+
+    ' Set the fill-down range for the "Balance" column
+    Set fillDownRangeW = intacctSheet.Range(intacctSheet.Cells(2, 23), intacctSheet.Cells(lastRowValue, 23))
+    fillDownRangeW.FillDown
+
+    ' Set the fill-down range for the "Payment ID" column
+        Set fillDownRangeF = intacctSheet.Range(intacctSheet.Cells(2, 6), intacctSheet.Cells(lastRowValue, 6))
+    fillDownRangeF.FillDown
+
+    ' Set the fill-down range for the "keep or delete" column
+    Set fillDownRangeY = intacctSheet.Range(intacctSheet.Cells(2, 25), intacctSheet.Cells(lastRowValue, 25))
+    fillDownRangeY.FillDown
+
+    ' Step 4: Apply Filter and Delete Rows in Intacct Report
+    intacctSheet.Activate
+    intacctSheet.AutoFilterMode = False ' Clear any existing filters
+    intacctSheet.Range("A1:Y" & lastRowValue).AutoFilter field:=25, Criteria1:="Delete"
+    
+    Dim i As Long
+    For i = lastRowValue To 2 Step -1
+        If intacctSheet.Cells(i, 25).Value = "Delete" Then
+            intacctSheet.Rows(i).Delete
+        End If
+    Next i
+    
+    intacctSheet.AutoFilterMode = False
+    intacctSheet.Columns("Y").Delete
+
+    ' Step 5: Sort and Conditional Formatting
+    intacctSheet.Range("A1:W" & lastRowValue).Sort Key1:=intacctSheet.Range("F1"), Order1:=xlAscending, Header:=xlYes, Key2:=intacctSheet.Range("G1"), Order2:=xlAscending, Header:=xlYes
+    intacctSheet.Range("G2:G" & lastRowValue).FormatConditions.Add Type:=xlTextString, String:="Duplicate", TextOperator:=xlContains
+    intacctSheet.Range("G2:G" & lastRowValue).FormatConditions(1).Interior.Color = RGB(255, 0, 0)
+
+    ' Step 6: Populate Additional Data
+    intacctSheet.Range("Z1").Value = "Memo/Description - 2"
+    intacctSheet.Range("AA1").Value = "Posted dt. - 2"
+    intacctSheet.Range("AB1").Value = "Doc dt. - 2"
+    intacctSheet.Range("Z2").formula = "=E2"
+    intacctSheet.Range("AA2").formula = "=B2"
+    intacctSheet.Range("AB2").formula = "=C2"
+    intacctSheet.Range("Z2:Z" & lastRowValue).FillDown
+    intacctSheet.Range("AA2:AA" & lastRowValue).FillDown
+    intacctSheet.Range("AB2:AB" & lastRowValue).FillDown
+
+    ' Step 7: Return to A1 of Intacct Report
+    intacctSheet.Range("A1").Select
+    
+    
+    ' Set formula in the first cell of the new "Duplicates" column (G2)
+    intacctSheet.Cells(2, 7).formula = "=IF(F2=""No PMT-ID"", IF(E2=E1, ""Duplicate"", IF(E3=E2, ""Duplicate"", """" )), IF(F2 = ""No PMT-ID"", """" ,IF(F2=F1, ""Duplicate"", IF(F3=F2, ""Duplicate"", """"))))"
+
+   
+    ' Get the last row for G value from Reference Page cell A4
+
+    lastRowValue2 = referenceSheet.Range("A4").Value
+   
+   
+    ' Set the fill-down range for the "Duplicates" column (G2 to G[lastRowValue])
+
+    Set fillDownRangeG = intacctSheet.Range(intacctSheet.Cells(2, 7), intacctSheet.Cells(lastRowValue2, 7))
+   
+   
+    ' Fill down formulas in the "Duplicates" column
+
+    fillDownRangeG.FillDown
+   
+    ' Step 8: Add a filter to row 1
+    intacctSheet.Range("A1:AB1").AutoFilter
+
+    ' Step 9: Change column width
+    intacctSheet.Columns("A:AB").ColumnWidth = 15
+    
+    ' Step 10: Conditional Formatting for Gold
+    intacctSheet.Range("F1,G1,W1,Z:Z,AA:AA,AB:AB").Interior.Color = RGB(255, 237, 1)
+
+    ' Step 11: Go to "Salesforce Report" worksheet
+    ThisWorkbook.Sheets("Salesforce Report").Activate
+    Dim sfSheet As Worksheet
+    Set sfSheet = ThisWorkbook.Sheets("Salesforce Report")
+    
+    ' Set values and formulas for rows 1 in "Salesforce Report" worksheet
+    sfSheet.Range("R1").Value = "..."
+    sfSheet.Range("S1").formula = "=O1"
+    sfSheet.Range("T1").formula = "=C1"
+    sfSheet.Range("U1").formula = "=D1"
+    sfSheet.Range("V1").formula = "=B1"
+    sfSheet.Range("W1").formula = "=K1"
+
+    ' Get the last row from Reference Page
+    Dim lastRowSalesforce As Long
+    lastRowSalesforce = referenceSheet.Range("A9").Value
+
+    ' Fill down formulas in "Salesforce Report" worksheet
+    sfSheet.Range("R1:W1").AutoFill Destination:=sfSheet.Range("R1:W" & lastRowSalesforce), Type:=xlFillDefault
+
+    ' Autofit columns and set specific width for column J
+    sfSheet.Columns.AutoFit
+    sfSheet.Columns("J").ColumnWidth = 50
+
+    ' Highlight specific columns in Gold
+    sfSheet.Range("R:W").Interior.Color = RGB(255, 237, 1)
+
+    ' Click on A1
+    sfSheet.Range("A1").Select
+    
+    ' Step 12: Create_Intacct_PivotTable
+    Dim refCell As Range
+    Dim intacctReportSheet As Worksheet
+    Dim intacctRange As Range
+    Dim pivotSheet As Worksheet
+    Dim pivotCache As pivotCache
+    Dim pivotTable As pivotTable
+    Dim pivotField As pivotField
+     
+    ' Get the reference cell from "Reference Page" A1
+    Set refCell = Worksheets("Reference Page").Range("A1")
+     
+    ' Get the corresponding worksheet ("Intacct Report") and create a range
+    Set intacctReportSheet = Worksheets("Intacct Report")
+    Set intacctRange = intacctReportSheet.Range("A1:" & refCell.Value)
+     
+    ' Copy the range
+    intacctRange.Copy
+     
+    ' Set the destination worksheet for the pivot table
+    Set pivotSheet = Worksheets("SF vs Intacct Variance Analysis")
+     
+    ' Create a pivot cache
+    Set pivotCache = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=intacctRange)
+     
+    ' Create a pivot table
+    Set pivotTable = pivotCache.CreatePivotTable(TableDestination:=pivotSheet.Range("$A$4"))
+     
+    ' Add fields to the pivot table
+    With pivotTable
+        .PivotFields("Payment ID").Orientation = xlRowField
+        .PivotFields("Memo/Description").Orientation = xlRowField
+    
+        ' Modify the "Balance" field for aggregation
+        Set pivotField = .PivotFields("Balance")
+        pivotField.Orientation = xlDataField
+        pivotField.Function = xlSum ' Set the aggregation function here
+        pivotField.NumberFormat = "#,##0.00" ' Optional: Set the number format
+        pivotField.Name = "Sum of Balance" ' Optional: Set the name of the data field
+    End With
+     
+    ' Set the PivotTable layout to tabular form and repeat item labels
+    pivotTable.RowAxisLayout xlTabularRow
+    pivotTable.CompactLayoutRowHeader = "Row headers" ' Repeat item labels
+     
+    ' For each pivot field in the pivot table, repeat all labels if the field is a row field
+    For Each pivotField In pivotTable.PivotFields
+        If pivotField.Orientation = xlRowField Then
+            pivotField.RepeatLabels = True
+        End If
+    Next pivotField
+     
+    ' Remove all subtotals
+    Dim field As pivotField
+    For Each field In pivotTable.PivotFields
+        field.Subtotals(1) = False ' Disable subtotals for each field
+    Next field
+     
+    
+    ' Step 13: Create Salesforce PivotTable
+    Dim refCell3 As Range
+    Dim SalesforceReportSheet As Worksheet
+    Dim SalesforceRange As Range
+    Dim pivotSheet3 As Worksheet
+    Dim pivotCache3 As pivotCache
+    Dim pivotTable3 As pivotTable
+    Dim pivotField3 As pivotField
+
+    ' Get the reference cell from "Reference Page" A6
+    Set refCell3 = Worksheets("Reference Page").Range("A6")
+
+    ' Get the corresponding worksheet ("Salesforce Report") and create a range
+    Set SalesforceReportSheet = Worksheets("Salesforce Report")
+    Set SalesforceRange = SalesforceReportSheet.Range("A1:" & refCell3.Value)
+
+    ' Set the destination worksheet for the pivot table
+    Set pivotSheet3 = Worksheets("SF vs Intacct Variance Analysis")
+
+    ' Create a pivot cache
+    Set pivotCache3 = ThisWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=SalesforceRange)
+
+    ' Create a pivot table
+    Set pivotTable3 = pivotCache3.CreatePivotTable(TableDestination:=pivotSheet3.Range("$I$4"))
+
+    ' Add fields to the pivot table
+    With pivotTable3
+        .PivotFields("Payment: Payment Number").Orientation = xlRowField
+        .PivotFields("Opportunity Name").Orientation = xlRowField
+
+        ' Modify the "Payment Amount" field for aggregation
+        Set pivotField3 = .PivotFields("Payment Amount")
+        pivotField3.Orientation = xlDataField
+        pivotField3.Function = xlSum ' Set the aggregation function here
+        pivotField3.NumberFormat = "#,##0.00" ' Optional: Set the number format
+        pivotField3.Name = "Sum of Payment Amount" ' Optional: Set the name of the data field
+    End With
+
+    ' Set the PivotTable layout to tabular form and repeat item labels
+    pivotTable3.RowAxisLayout xlTabularRow
+    pivotTable3.CompactLayoutRowHeader = "Row headers" ' Repeat item labels
+
+    ' For each pivot field in the pivot table, repeat all labels if the field is a row field
+    For Each pivotField3 In pivotTable3.PivotFields
+        If pivotField3.Orientation = xlRowField Then
+            pivotField3.RepeatLabels = True
+        End If
+    Next pivotField3
+
+    ' Remove all subtotals
+    Dim field3 As pivotField
+    For Each field3 In pivotTable3.PivotFields
+        field3.Subtotals(1) = False ' Disable subtotals for each field
+    Next field3
+
+    ' Activate the pivotSheet3 worksheet
+    pivotSheet3.Activate
+    
+    ' Adjust column width for all cells in the worksheet
+    pivotSheet3.Cells.ColumnWidth = 15
+    
+    ' Select a specific cell (e.g., O5)
+    pivotSheet3.Range("O5").Select
+    
+    ' Calculate the last row for filling down
+    Dim lastRow As Long
+    lastRow = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Evaluate("MAX(IF(A:A<>"""", ROW(A:A)))")
+    
+    ' Calculate the last row for columns J
+    Dim lastRowJ As Long
+    lastRowJ = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Evaluate("MAX(IF(I:I<>"""", ROW(I:I)))")
+    
+    ' Fill down formulas in columns D, E, F, G
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("D5:D" & lastRow).formula = "=IFERROR(VLOOKUP(A5,$I$4:INDIRECT($K$1),3,0),0)"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("E5:E" & lastRow).formula = "=C5+D5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("F5:F" & lastRow).formula = "=A5&""_""&B5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("G5:G" & lastRow).formula = "=IF(A5=""Grand Total"",""Don't Use"",IF(E5=0,""Don’t Use"",""Use""))"
+    
+    ' Fill down formulas in columns L, M, N, O
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("L5:L" & lastRowJ).formula = "=IFERROR(VLOOKUP(I5,$A$4:INDIRECT($C$1),3,0),0)"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("M5:M" & lastRowJ).formula = "=K5+L5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("N5:N" & lastRowJ).formula = "=I5&""_""&J5"
+    ThisWorkbook.Sheets("SF vs Intacct Variance Analysis").Range("O5:O" & lastRowJ).formula = "=IF(I5=""Grand Total"",""Don't Use"",IF(M5=0,""Don’t Use"",""Use""))"
+
+    ' Step 14: Copy and Paste Values from "SF vs Intacct Variance Analysis" to "Summary" worksheet
+    Dim summarySheet As Worksheet
+    Set summarySheet = ThisWorkbook.Sheets("Summary")
+
+    Dim sfVsIntacctSheet As Worksheet
+    Set sfVsIntacctSheet = ThisWorkbook.Sheets("SF vs Intacct Variance Analysis")
+
+    Dim lastRowSFvsIntacct As Long
+    lastRowSFvsIntacct = sfVsIntacctSheet.Cells(sfVsIntacctSheet.Rows.Count, "G").End(xlUp).Row
+
+    Dim copyRow As Long
+    Dim pasteRow As Long
+    copyRow = 5 ' Starting row in "SF vs Intacct Variance Analysis" to copy from
+    pasteRow = 4 ' Row in "Summary" worksheet to paste into
+
+    ' Loop through each row in the "SF vs Intacct Variance Analysis" sheet and check column G
+    For copyRow = 5 To lastRowSFvsIntacct
+        If sfVsIntacctSheet.Cells(copyRow, "G").Value = "Use" Then
+            ' Copy values from columns E and F
+            Dim valueE As Variant
+            Dim valueF As Variant
+            valueE = sfVsIntacctSheet.Cells(copyRow, "E").Value
+            valueF = sfVsIntacctSheet.Cells(copyRow, "F").Value
+
+            ' Paste values into "Summary" worksheet
+            summarySheet.Cells(pasteRow, "D").Value = valueE
+            summarySheet.Cells(pasteRow, "F").Value = valueF
+
+            pasteRow = pasteRow + 1 ' Move to the next row in "Summary" for pasting
+        End If
+    Next copyRow
+    
+    ' Step 14 (Continuation): Copy and Paste Additional Values from "SF vs Intacct Variance Analysis" to "Summary" worksheet
+    Dim lastRowSummary As Long
+    lastRowSummary = summarySheet.Evaluate("MAX(IF(C:C<>"""", ROW(C:C)))") + 1
+    
+    Dim copyRow2 As Long
+    Dim pasteRow2 As Long
+    copyRow2 = 5 ' Starting row in "SF vs Intacct Variance Analysis" to copy from
+    
+    ' Loop through each row in the "SF vs Intacct Variance Analysis" sheet and check column O
+    For copyRow2 = 5 To lastRowSFvsIntacct
+        If sfVsIntacctSheet.Cells(copyRow2, "O").Value = "Use" Then
+            ' Copy values from columns M and N
+            Dim valueM As Variant
+            Dim valueN As Variant
+            valueM = sfVsIntacctSheet.Cells(copyRow2, "M").Value
+            valueN = sfVsIntacctSheet.Cells(copyRow2, "N").Value
+    
+            ' Calculate the row to paste in the "Summary" worksheet
+            Dim lastRowF As Long
+            lastRowF = summarySheet.Evaluate("MAX(IF(F:F<>"""", ROW(F:F)))") + 1
+    
+            ' Paste values into "Summary" worksheet
+            summarySheet.Cells(lastRowF, "C").Value = valueM
+            summarySheet.Cells(lastRowF, "F").Value = valueN
+    
+            ' Move value from column D to column F in "Summary" worksheet
+            summarySheet.Cells(lastRowF, "F").Value = valueN
+    
+            ' Update lastRowF to account for the new data pasted
+            lastRowF = lastRowF + 1
+    
+            ' Move to the next row in "Summary" for potential future pasting
+            pasteRow2 = pasteRow2 + 1
+        End If
+    Next copyRow2
+    
+End Sub
+Sub PerformTasks()
+    Dim lastRow As Long
+    Dim workSheet5 As Worksheet
+    Dim workSheet6 As Worksheet
+    Dim workSheet10 As Worksheet
+    Dim workSheet11 As Worksheet
+    Dim workSheet12 As Worksheet
+    Dim workSheet13 As Worksheet
+    Dim i As Long
+    
+    ' Set a reference to the "Summary" worksheet
+    Set workSheet5 = Worksheets("Summary")
+    
+    ' Set references to other worksheets
+    Set workSheet10 = Worksheets("Summary")
+    Set workSheet11 = Worksheets("SF vs Intacct Variance Analysis")
+    Set workSheet12 = Worksheets("Intacct Report")
+    Set workSheet13 = Worksheets("Salesforce Report")
+    
+    ' Hide "Reference Page" worksheet
+    Worksheets("Reference Page").Visible = xlSheetHidden
+    
+    ' Find the last row of data in column F
+    lastRow = workSheet5.Cells(workSheet5.Rows.Count, "F").End(xlUp).Row
+    
+    ' Fill down formulas in columns B, E, G, H, I, J, K
+    workSheet5.Range("B4:B" & lastRow).formula = "=IF(AND(C4="""",D4=""""),"""",IF(LEN(C4)>0,ABS(C4),ABS(D4)))"
+    workSheet5.Range("E4:E" & lastRow).formula = "=IF(LEFT(F4,1)=""P"",LEFT(F4,FIND(""_"",F4)-1),""No PMT-ID"")"
+    workSheet5.Range("G4:G" & lastRow).formula = "=IF(LEN(D4)>0,IF(ISNUMBER(FIND("","",RIGHT(F4,LEN(F4)-FIND(""*"",F4)))),TRIM(RIGHT(RIGHT(F4,LEN(F4)-FIND(""*"",F4)),LEN(RIGHT(F4,LEN(F4)-FIND(""*"",F4)))-FIND("","",RIGHT(F4,LEN(F4)-FIND(""*"",F4))))) & "" "" & LEFT(RIGHT(F4,LEN(F4)-FIND(""*"",F4)),FIND("","",RIGHT(F4,LEN(F4)-FIND(""*"",F4)))-1),IF(ISNUMBER(FIND(""*"",F4)),RIGHT(F4,LEN(F4)-FIND(""*"",F4)),""No Name in Intacct"")),VLOOKUP(LEFT(F4,FIND(""_"",F4)-1),'Salesforce Report'!S:U,3,0))"
+    
+    For i = 4 To lastRow
+        ' Fill column H with sequential numbers starting from 1
+        workSheet5.Cells(i, "H").Value = i - 3
+        
+        ' Formula for column I
+        workSheet5.Cells(i, "I").formula = "=IF(G" & i & "=G" & (i - 1) & ",""Same Name"","""")"
+        
+        ' Formula for column J
+        workSheet5.Cells(i, "J").formula = "=IF(AND(C" & i & "="""",D" & i & "=""""),"""",IF(LEN(C" & i & ")>0,TEXT(IFERROR(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:V,4,0),""""),""YYYY/MM/DD""),TEXT(IFERROR(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,2,0),""""),""YYYY/MM/DD"")))"
+        
+        ' Formula for column K
+        workSheet5.Cells(i, "K").formula = "=IF(AND(C" & i & "="""",D" & i & "=""""),"""",IF(LEN(C" & i & ")>0,IF(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:W,5,0)<>0,TEXT(VLOOKUP(LEFT(F" & i & ",FIND(""_"",F" & i & ")-1),'Salesforce Report'!S:W,5,0),""YYYY/MM/DD""),""""),IF(LEN(D" & i & ")>0,IF(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,3,0)=0,"""",TEXT(VLOOKUP(RIGHT(F" & i & ",LEN(F" & i & ")-FIND(""_"",F" & i & ")), 'Intacct Report'!Z:AB,3,0),""YYYY/MM/DD"")),"""")))"
+    Next i
+    
+    ' Format columns A, B, C, D as custom format for accounting style with parentheses and comma style
+    workSheet5.Range("A:A, B:B, C:C, D:D").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+    
+    ' Apply autofilter to A3:K3
+    workSheet5.Range("A3:K3").AutoFilter
+    
+    ' Set a reference to the "SF vs Intacct Variance Analysis" worksheet
+    Set workSheet6 = Worksheets("SF vs Intacct Variance Analysis")
+    
+    ' Format in "SF vs Intacct Variance Analysis" Worksheet columns C, D, E, L, N, M as custom format for accounting style with parentheses and comma style
+    workSheet6.Range("C:C, D:D, E:E, L:L, N:N, M:M").NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+    
+    ' Reorder worksheets
+    workSheet10.Move Before:=workSheet11
+    workSheet11.Move Before:=workSheet13
+    workSheet13.Move Before:=workSheet12
+    
+ ' Loop through each visible worksheet and activate cell A1
+    Dim ws As Worksheet
+    For Each ws In Worksheets
+        If ws.Visible = xlSheetVisible Then
+            ws.Activate
+            ws.Cells(1, 1).Activate
+        End If
+    Next ws
+    
+    ' Go back to the "Summary" worksheet and activate cell A1
+    workSheet10.Activate
+    workSheet10.Cells(1, 1).Activate
+End Sub
+
