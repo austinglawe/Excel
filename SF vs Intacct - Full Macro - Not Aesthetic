@@ -696,7 +696,6 @@ Sub Step2b_Import_Intacct_after_SF()
     End If
 End Sub
  
-
 Sub Step3_SF_vs_Intacct_Recon_SetUp()
     
     ' Step 1: Check if cells are populated
@@ -1087,10 +1086,13 @@ Sub Step3_SF_vs_Intacct_Recon_SetUp()
     
     Dim copyRow2 As Long
     Dim pasteRow2 As Long
-    copyRow2 = 5 ' Starting row in "SF vs Intacct Variance Analysis" to copy from
+    copyRow2 = lastRowSummary ' Starting row in "SF vs Intacct Variance Analysis" to copy from
+    ' End row for SF Pivot Table
+    Dim lastRowSFvsIntacctSF As Long
+    lastRowSFvsIntacctSF = sfVsIntacctSheet.Cells(sfVsIntacctSheet.Rows.Count, "I").End(xlUp).Row
     
     ' Loop through each row in the "SF vs Intacct Variance Analysis" sheet and check column O
-    For copyRow2 = 5 To lastRowSFvsIntacct
+    For copyRow2 = 5 To lastRowSFvsIntacctSF
         If sfVsIntacctSheet.Cells(copyRow2, "O").Value = "Use" Then
             ' Copy values from columns M and N
             Dim valueM As Variant
@@ -1190,6 +1192,7 @@ Sub Step3_SF_vs_Intacct_Recon_SetUp()
     workSheet10.Activate
     workSheet10.Cells(1, 1).Activate
 End Sub
+
 
 
 
